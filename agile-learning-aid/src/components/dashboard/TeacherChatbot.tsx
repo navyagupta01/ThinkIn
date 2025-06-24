@@ -11,6 +11,8 @@ interface Message {
   timestamp: Date;
 }
 
+type ContextStage = 'idle' | 'awaiting_subject' | 'awaiting_duration' | 'ready';
+
 const TeacherChatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -20,7 +22,12 @@ const TeacherChatbot: React.FC = () => {
       timestamp: new Date()
     }
   ]);
+
   const [inputText, setInputText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [contextStage, setContextStage] = useState<ContextStage>('idle');
+  const [lessonSubject, setLessonSubject] = useState('');
+  const [lessonDuration, setLessonDuration] = useState('');
 
   const quickPrompts = [
     {
@@ -65,42 +72,87 @@ const TeacherChatbot: React.FC = () => {
     }
   ];
 
-  const handleSendMessage = () => {
-    if (inputText.trim()) {
-      const newUserMessage: Message = {
-        id: Date.now(),
-        text: inputText,
-        sender: 'user',
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, newUserMessage]);
-      setInputText('');
-
-      // Simulate bot response
-      setTimeout(() => {
-        const botResponse: Message = {
-          id: Date.now() + 1,
-          text: generateBotResponse(inputText),
-          sender: 'bot',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, botResponse]);
-      }, 1000);
-    }
+  const addBotMessage = (text: string) => {
+    const botMessage: Message = {
+      id: Date.now() + 1,
+      text,
+      sender: 'bot',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, botMessage]);
   };
 
-  const generateBotResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-    
-    if (input.includes('lesson plan')) {
-      return "I'd be happy to help you create a lesson plan! To provide the most relevant suggestions, could you tell me: 1) What subject and grade level? 2) What's the main learning objective? 3) How long is the class period? 4) What resources do you have available?";
-    } else if (input.includes('engagement') || input.includes('participate')) {
-      return "Great question! Here are some proven strategies to boost student engagement: 1) Use interactive polls and quizzes 2) Incorporate group discussions and peer learning 3) Connect lessons to real-world applications 4) Use multimedia and visual aids 5) Encourage questions and create a safe learning environment. Would you like me to elaborate on any of these strategies?";
-    } else if (input.includes('quiz') || input.includes('assessment')) {
-      return "I can help you create effective assessments! For quiz questions, I recommend using a mix of: 1) Multiple choice for quick knowledge checks 2) Short answer for concept understanding 3) Problem-solving questions for application 4) Essay questions for deeper analysis. What subject area are you assessing, and what learning objectives do you want to measure?";
-    } else {
-      return "That's an interesting question! I'm here to help with various teaching challenges. Could you provide more details about what you're looking for? I can assist with lesson planning, student engagement, classroom management, assessment creation, and much more.";
+  const handleSendMessage = async () => {
+    if (!inputText.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now(),
+      text: inputText,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputText('');
+
+    if (contextStage === 'awaiting_subject') {
+      setLessonSubject(inputText);
+      setContextStage('awaiting_duration');
+      addBotMessage('Got it! How long is the class (in minutes)?');
+      return;
+    }
+
+    if (contextStage === 'awaiting_duration') {
+      setLessonDuration(inputText);
+      setContextStage('ready');
+      addBotMessage(`Subject: ${lessonSubject}\nDuration: ${inputText} mins\nGenerating full lesson plan...`);
+    }
+
+    if (contextStage === 'idle' && /lesson plan|make a plan/i.test(inputText)) {
+      setContextStage('awaiting_subject');
+      addBotMessage('Sure! What subject is the lesson for?');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer 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',
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://yourwebsite.com',
+            'X-Title': 'EduChatbot'
+          },
+        body: JSON.stringify({
+          model: 'mistralai/mixtral-8x7b-instruct',
+          messages: [
+            {
+              role: 'system',
+              content:
+                "You are EduChatBot, a friendly AI education assistant.\nRespond with clear formatting: use paragraphs, line breaks, and numbered or bulleted lists when appropriate.\nOnly provide full lesson plans when you know the subject and class duration."
+            },
+            ...messages.map((msg) => ({
+              role: msg.sender === 'user' ? 'user' : 'assistant',
+              content: msg.text
+            })),
+            { role: 'user', content: inputText }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      const botResponse = data?.choices?.[0]?.message?.content || 'Sorry, something went wrong.';
+      addBotMessage(botResponse);
+
+      setContextStage('idle');
+      setLessonSubject('');
+      setLessonDuration('');
+    } catch (err) {
+      addBotMessage("Oops! Couldn't fetch a response. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,14 +162,12 @@ const TeacherChatbot: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="bg-gradient-to-r from-intel-darkblue to-intel-blue rounded-2xl p-6 text-white">
         <h1 className="text-3xl font-bold mb-2">AI Teaching Assistant 🤖</h1>
         <p className="text-blue-100">Get personalized help with lesson planning, student engagement, and more</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Quick Prompts */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="text-lg">Quick Prompts</CardTitle>
@@ -153,116 +203,67 @@ const TeacherChatbot: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Chat Interface */}
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <MessageCircle className="h-5 w-5 mr-2" />
-              AI Chat Assistant
+              <MessageCircle className="h-5 w-5 mr-2" /> AI Chat Assistant
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Messages Container */}
             <div className="h-96 overflow-y-auto space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex items-start space-x-3 ${
-                    message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-                  }`}
+                  className={`flex items-start space-x-3 ${message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
                 >
-                  <div className={`p-2 rounded-full ${
-                    message.sender === 'user' 
-                      ? 'bg-intel-blue' 
-                      : 'bg-gray-200 dark:bg-gray-700'
-                  }`}>
+                  <div
+                    className={`p-2 rounded-full ${
+                      message.sender === 'user' ? 'bg-intel-blue' : 'bg-gray-200 dark:bg-gray-700'
+                    }`}
+                  >
                     {message.sender === 'user' ? (
                       <User className="h-4 w-4 text-white" />
                     ) : (
                       <Bot className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                     )}
                   </div>
-                  <div className={`max-w-xs lg:max-w-md xl:max-w-lg p-3 rounded-lg ${
-                    message.sender === 'user'
-                      ? 'bg-intel-blue text-white'
-                      : 'bg-gray-100 dark:bg-gray-800'
-                  }`}>
-                    <p className="text-sm">{message.text}</p>
-                    <p className={`text-xs mt-1 ${
-                      message.sender === 'user' 
-                        ? 'text-blue-100' 
-                        : 'text-gray-500 dark:text-gray-400'
-                    }`}>
-                      {message.timestamp.toLocaleTimeString([], { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
+                  <div
+                    className={`max-w-xs lg:max-w-md xl:max-w-lg p-3 rounded-lg ${
+                      message.sender === 'user' ? 'bg-intel-blue text-white' : 'bg-gray-100 dark:bg-gray-800'
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-line">{message.text}</p>
+                    <p
+                      className={`text-xs mt-1 ${
+                        message.sender === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
+                      }`}
+                    >
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Input Area */}
             <div className="flex space-x-2">
               <Input
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Ask me anything about teaching..."
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                 className="flex-1"
               />
-              <Button 
+              <Button
                 onClick={handleSendMessage}
                 className="bg-intel-blue hover:bg-intel-darkblue"
-                disabled={!inputText.trim()}
+                disabled={!inputText.trim() || loading}
               >
-                <Send className="h-4 w-4" />
+                {loading ? '...' : <Send className="h-4 w-4" />}
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* AI Features */}
-      <Card>
-        <CardHeader>
-          <CardTitle>AI Assistant Capabilities</CardTitle>
-          <CardDescription>Here's how I can help enhance your teaching</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <BookOpen className="h-8 w-8 text-blue-500 mb-2" />
-              <h4 className="font-medium mb-1">Lesson Planning</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Create comprehensive lesson plans, learning objectives, and activity suggestions.
-              </p>
-            </div>
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <Users className="h-8 w-8 text-green-500 mb-2" />
-              <h4 className="font-medium mb-1">Student Engagement</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Strategies to increase participation and make learning more interactive.
-              </p>
-            </div>
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <BarChart3 className="h-8 w-8 text-purple-500 mb-2" />
-              <h4 className="font-medium mb-1">Assessment Design</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Generate quiz questions, rubrics, and alternative assessment methods.
-              </p>
-            </div>
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <Lightbulb className="h-8 w-8 text-orange-500 mb-2" />
-              <h4 className="font-medium mb-1">Teaching Tips</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Classroom management, time management, and pedagogical best practices.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
