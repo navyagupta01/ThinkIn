@@ -1,45 +1,53 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, FileText, Video, Image, BookOpen, Edit3 } from 'lucide-react';
 
 const TeacherCreateContent: React.FC = () => {
+  const navigate = useNavigate();
+
   const contentTypes = [
     {
       id: 1,
       title: 'Create Lesson Plan',
       description: 'Design structured lesson plans with objectives and activities',
       icon: BookOpen,
-      color: 'bg-blue-500'
+      color: 'bg-blue-500',
+      action: () => navigate('/create/lesson-plan'),
     },
     {
       id: 2,
       title: 'Upload Video Content',
       description: 'Add educational videos to your course library',
       icon: Video,
-      color: 'bg-red-500'
+      color: 'bg-red-500',
+      action: () => navigate('/create/video'),
     },
     {
       id: 3,
       title: 'Create Quiz',
       description: 'Build interactive quizzes to test student understanding',
       icon: Edit3,
-      color: 'bg-green-500'
+      color: 'bg-green-500',
+      action: () => navigate('/create/quiz'),
     },
     {
       id: 4,
       title: 'Upload Documents',
       description: 'Share PDFs, presentations, and other learning materials',
       icon: FileText,
-      color: 'bg-purple-500'
+      color: 'bg-purple-500',
+      action: () => navigate('/create/documents'),
     },
     {
       id: 5,
       title: 'Add Images',
       description: 'Upload diagrams, charts, and visual aids',
       icon: Image,
-      color: 'bg-orange-500'
-    }
+      color: 'bg-orange-500',
+      action: () => navigate('/create/images'),
+    },
   ];
 
   const recentContent = [
@@ -74,7 +82,10 @@ const TeacherCreateContent: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="mb-4">{type.description}</CardDescription>
-                <Button className="w-full bg-intel-blue hover:bg-intel-darkblue">
+                <Button
+                  className="w-full bg-intel-blue hover:bg-intel-darkblue"
+                  onClick={type.action}
+                >
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Create New
                 </Button>

@@ -12,7 +12,7 @@
 .env.production.local
 
 # Python virtual environment (in apps/)
-apps/ttsenv/*
+avatar_teacher-main/apps/ttsenv
 
 # Python artifacts
 __pycache__/

@@ -1,8 +1,20 @@
 [
   {
-    "id": 1750629855694,
-    "question": "hi what are acids and bases??",
-    "answer": "Acids are substances that can donate protons (H+) in a chemical reaction, while bases are substances that can accept protons. They are fundamental concepts in chemistry, often defined by the pH scale, where acids have a pH less than 7 and bases have a pH greater than 7. Acids typically have a sour taste and can be found in substances like vinegar and citrus fruits, whereas bases usually have a bitter taste and feel slippery, like soap. The interaction between acids and bases can lead to neutralization, producing water and a salt, which is an important reaction in various chemical processes.",
-    "timestamp": "2025-06-22T22:04:15.694Z"
+    "id": 1751131176181,
+    "question": "hi what is AI??",
+    "answer": "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. AI can perform tasks such as problem-solving, understanding natural language, and recognizing patterns. It's a rapidly evolving field that impacts various industries, from healthcare to finance.",
+    "timestamp": "2025-06-28T17:19:36.181Z"
+  },
+  {
+    "id": 1750756320766,
+    "question": "hi what is C++??",
+    "answer": "C++ is a high-level programming language that is an extension of the C programming language. It includes object-oriented features and is widely used for system/software development, game development, and performance-critical applications. C++ supports various programming paradigms, including procedural, object-oriented, and generic programming, making it versatile for different types of projects. It was developed by Bjarne Stroustrup starting in 1979 at Bell Labs and has since become one of the most popular programming languages in the world.",
+    "timestamp": "2025-06-24T09:12:00.766Z"
+  },
+  {
+    "id": 1750756211921,
+    "question": "hi what is AI??",
+    "answer": "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. AI can perform tasks such as understanding natural language, recognizing patterns, and making decisions based on data. It's a rapidly evolving field that impacts various industries, from healthcare to finance and beyond.",
+    "timestamp": "2025-06-24T09:10:11.921Z"
   }
 ]

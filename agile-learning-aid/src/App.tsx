@@ -22,11 +22,12 @@ import StudentChatbot from "./components/dashboard/StudentChatbot";
 import StudentNotes from "./components/dashboard/StudentNotes";
 import StudentQuizzes from "./components/dashboard/StudentQuizzes";
 
-// Import the new teacher pages
+// Import the teacher pages
 import TeacherCreateContent from "./components/dashboard/TeacherCreateContent";
 import TeacherSchedule from "./components/dashboard/TeacherSchedule";
 import TeacherAnalytics from "./components/dashboard/TeacherAnalytics";
 import TeacherChatbot from "./components/dashboard/TeacherChatbot";
+import LessonPlanGenerator from "./components/dashboard/LessonPlanGenerator";
 
 // Import the ChatbotWrapper
 import ChatbotWrapper from "./components/dashboard/ChatbotWrapper";
@@ -95,6 +96,12 @@ const App = () => (
                   <Route path="/create" element={
                     <ProtectedRoute allowedRoles={['teacher']}>
                       <TeacherCreateContent />
+                    </ProtectedRoute>
+                  } />
+
+                  <Route path="/create/lesson-plan" element={
+                    <ProtectedRoute allowedRoles={['teacher']}>
+                      <LessonPlanGenerator />
                     </ProtectedRoute>
                   } />
 
