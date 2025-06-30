@@ -28,6 +28,7 @@ import TeacherSchedule from "./components/dashboard/TeacherSchedule";
 import TeacherAnalytics from "./components/dashboard/TeacherAnalytics";
 import TeacherChatbot from "./components/dashboard/TeacherChatbot";
 import LessonPlanGenerator from "./components/dashboard/LessonPlanGenerator";
+import EditContent from "./components/dashboard/EditContent"; // Added import for EditContent
 
 // Import the ChatbotWrapper
 import ChatbotWrapper from "./components/dashboard/ChatbotWrapper";
@@ -102,6 +103,12 @@ const App = () => (
                   <Route path="/create/lesson-plan" element={
                     <ProtectedRoute allowedRoles={['teacher']}>
                       <LessonPlanGenerator />
+                    </ProtectedRoute>
+                  } />
+
+                  <Route path="/edit/content/:id" element={ // Added route for editing content
+                    <ProtectedRoute allowedRoles={['teacher']}>
+                      <EditContent />
                     </ProtectedRoute>
                   } />
 

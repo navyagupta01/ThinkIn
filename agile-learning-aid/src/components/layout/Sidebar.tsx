@@ -105,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed, onToggl
               </div>
               {!isCollapsed && (
                 <span className="text-xl font-bold bg-gradient-to-r from-[#0071c5] to-[#004494] bg-clip-text text-transparent whitespace-nowrap">
-                  LearnAI
+                  ThinkIN
                 </span>
               )}
             </div>

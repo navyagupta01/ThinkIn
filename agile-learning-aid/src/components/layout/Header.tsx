@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, showSidebarToggle = tr
               <span className="text-white font-bold text-sm">AI</span>
             </div>
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              LearnAI
+              ThinkIN
             </h1>
           </div>
         </div>
