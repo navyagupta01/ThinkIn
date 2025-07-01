@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { PlusCircle, FileText, Video, Image, BookOpen, Edit3 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { toast } from '@/hooks/use-toast';
 
 interface FormData {
   title: string;
@@ -108,7 +109,7 @@ const TeacherCreateContent: React.FC = () => {
       setRecentContent(data);
     } catch (error: any) {
       setError(error.message || 'Error fetching recent content');
-      console.error('Error fetching recent content:', error);
+      toast({ title: 'Error', description: error.message || 'Error fetching recent content', variant: 'destructive' });
     }
   };
 
@@ -121,6 +122,7 @@ const TeacherCreateContent: React.FC = () => {
   const handleSubmit = async (type: string) => {
     if (!formData.title || !formData.subject || !formData.file) {
       setError('Please fill all fields and select a file.');
+      toast({ title: 'Error', description: 'Please fill all fields and select a file.', variant: 'destructive' });
       return;
     }
 
@@ -141,12 +143,16 @@ const TeacherCreateContent: React.FC = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to upload content');
       }
-      alert('Content uploaded successfully');
+      toast({
+        title: 'Success',
+        description: 'Content uploaded successfully'
+      });
       setFormData({ title: '', subject: '', file: null });
       setShowForm(null);
       fetchRecentContent();
     } catch (error: any) {
       setError(error.message || 'Error uploading content');
+      toast({ title: 'Error', description: error.message || 'Error uploading content', variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -154,20 +160,17 @@ const TeacherCreateContent: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="bg-gradient-to-r from-intel-darkblue to-intel-blue rounded-2xl p-6 text-white">
         <h1 className="text-3xl font-bold mb-2">Create Content 📚</h1>
         <p className="text-blue-100">Design engaging lessons and learning materials for your students</p>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="p-4 bg-red-50 text-red-800 rounded-lg">
           {error}
         </div>
       )}
 
-      {/* Content Creation Options */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {contentTypes.map((type) => {
           const Icon = type.icon;
@@ -199,7 +202,6 @@ const TeacherCreateContent: React.FC = () => {
         })}
       </div>
 
-      {/* Upload Form */}
       {showForm && (
         <Card>
           <CardHeader>
@@ -245,7 +247,6 @@ const TeacherCreateContent: React.FC = () => {
         </Card>
       )}
 
-      {/* Recent Content */}
       <Card>
         <CardHeader>
           <CardTitle>Recent Content</CardTitle>
@@ -292,7 +293,6 @@ const TeacherCreateContent: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Quick Tips */}
       <Card>
         <CardHeader>
           <CardTitle>Content Creation Tips</CardTitle>
@@ -308,7 +308,7 @@ const TeacherCreateContent: React.FC = () => {
             <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <h4 className="font-medium mb-2">Clear Objectives</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Define clear learning objectives for Hints for each lesson to guide student progress.
+                Define clear learning objectives for each lesson to guide student progress.
               </p>
             </div>
           </div>

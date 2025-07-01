@@ -1,14 +1,14 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
+import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   updateProfile,
-  User as FirebaseUser
+  User as FirebaseUser,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 
 type UserRole = 'student' | 'teacher';
@@ -27,6 +27,7 @@ interface AuthContextType {
   signup: (email: string, password: string, name: string, role: UserRole) => Promise<void>;
   logout: () => Promise<void>;
   isLoading: boolean;
+  getTotalStudents: () => Promise<number>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,105 +45,108 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const getTotalStudents = async () => {
+    try {
+      console.log('getTotalStudents: Starting query');
+      const studentsQuery = query(collection(db, 'users'), where('role', '==', 'student'));
+      console.log('getTotalStudents: Query constructed:', studentsQuery);
+      const querySnapshot = await getDocs(studentsQuery);
+      console.log('getTotalStudents: Query succeeded, size:', querySnapshot.size);
+      return querySnapshot.size;
+    } catch (error) {
+      console.error('Error fetching total students:', error.code, error.message, error.stack);
+      return 0;
+    }
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      console.log('Auth state changed:', firebaseUser?.email);
-      
-      if (firebaseUser) {
-        setFirebaseUser(firebaseUser);
-        
-        // Get additional user data from Firestore
-        try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const userObj = {
-              id: firebaseUser.uid,
-              name: userData.name || firebaseUser.displayName || '',
-              email: firebaseUser.email || '',
-              role: userData.role || 'student'
-            };
-            console.log('Setting user data:', userObj);
-            setUser(userObj);
-          } else {
-            // Fallback if no Firestore document exists
-            const fallbackUser = {
-              id: firebaseUser.uid,
-              name: firebaseUser.displayName || '',
-              email: firebaseUser.email || '',
-              role: 'student' as UserRole
-            };
-            console.log('Setting fallback user data:', fallbackUser);
-            setUser(fallbackUser);
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-          // Fallback to Firebase Auth data only
-          const errorFallbackUser = {
+  const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    console.log('Auth state changed:', firebaseUser?.email);
+
+    if (firebaseUser) {
+      setFirebaseUser(firebaseUser);
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const userObj = {
+            id: firebaseUser.uid,
+            name: userData.name || firebaseUser.displayName || '',
+            email: firebaseUser.email || '',
+            role: userData.role || 'student',
+          };
+          console.log('Setting user data:', userObj);
+          setUser(userObj);
+        } else {
+          console.warn('User document does not exist for UID:', firebaseUser.uid);
+          const fallbackUser = {
             id: firebaseUser.uid,
             name: firebaseUser.displayName || '',
             email: firebaseUser.email || '',
-            role: 'student' as UserRole
+            role: 'student' as UserRole,
           };
-          console.log('Setting error fallback user data:', errorFallbackUser);
-          setUser(errorFallbackUser);
+          console.log('Setting fallback user data:', fallbackUser);
+          setUser(fallbackUser);
         }
-      } else {
-        console.log('No user, clearing state');
-        setFirebaseUser(null);
-        setUser(null);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        const errorFallbackUser = {
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName || '',
+          email: firebaseUser.email || '',
+          role: 'student' as UserRole,
+        };
+        console.log('Setting error fallback user data:', errorFallbackUser);
+        setUser(errorFallbackUser);
       }
-      setIsLoading(false);
-    });
+    } else {
+      console.log('No user, clearing state');
+      setFirebaseUser(null);
+      setUser(null);
+    }
+    setIsLoading(false);
+  });
 
-    return () => unsubscribe();
-  }, []);
+  return () => unsubscribe();
+}, []);
 
   const signup = async (email: string, password: string, name: string, role: UserRole) => {
     setIsLoading(true);
     try {
       console.log('Starting signup process...');
-      
-      // Create user with Firebase Auth
+
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
       console.log('Firebase user created:', firebaseUser.uid);
 
-      // Update the user's display name
       await updateProfile(firebaseUser, {
-        displayName: name
+        displayName: name,
       });
       console.log('Display name updated');
 
-      // Store additional user data in Firestore
       await setDoc(doc(db, 'users', firebaseUser.uid), {
         name,
         email,
         role,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
       console.log('Firestore document created');
 
-      // The user state will be automatically updated by the onAuthStateChanged listener
-      // But we can set a temporary state for immediate UI feedback
       const newUser = {
         id: firebaseUser.uid,
         name,
         email,
-        role
+        role,
       };
-      
+
       setUser(newUser);
       setFirebaseUser(firebaseUser);
       console.log('Signup process completed');
-      
     } catch (error: any) {
       console.error('Signup error:', error);
       setIsLoading(false);
       throw new Error(error.message);
-    } finally {
-      // Don't set isLoading to false here, let the auth state change handle it
-      // This prevents the loading state from flickering
     }
   };
 
@@ -151,7 +155,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('User logged in:', userCredential.user.email);
-      // The user state will be set automatically by the onAuthStateChanged listener
     } catch (error: any) {
       setIsLoading(false);
       throw new Error(error.message);
@@ -162,21 +165,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await signOut(auth);
       console.log('User logged out');
-      // The user state will be set to null automatically by the onAuthStateChanged listener
     } catch (error: any) {
       throw new Error(error.message);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      firebaseUser, 
-      login, 
-      signup, 
-      logout, 
-      isLoading 
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        firebaseUser,
+        login,
+        signup,
+        logout,
+        isLoading,
+        getTotalStudents,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

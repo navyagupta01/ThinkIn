@@ -1,74 +1,264 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { BookOpen, Search, Plus, Edit, Trash2, Calendar, Tag, Filter } from 'lucide-react';
+import { BookOpen, Search, Plus, Edit, Trash2, Calendar, Tag, Filter, Sparkles, Loader2 } from 'lucide-react';
+
+interface Note {
+  id: string | number;
+  title: string;
+  subject: string;
+  content: string;
+  date: string;
+  tags: string[];
+  lastModified: string;
+}
+
+interface Subject {
+  name: string;
+  count: number;
+  color: string;
+}
 
 const StudentNotes: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [isImproving, setIsImproving] = useState(false);
+  const [showImproveModal, setShowImproveModal] = useState(false);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const notes = [
-    {
-      id: 1,
-      title: 'Quadratic Equations - Chapter 5',
-      subject: 'Mathematics',
-      content: 'Key concepts: ax² + bx + c = 0, discriminant, roots, factoring methods...',
-      date: '2024-01-15',
-      tags: ['algebra', 'equations', 'important'],
-      lastModified: '2 days ago'
-    },
-    {
-      id: 2,
-      title: 'Newton\'s Laws of Motion',
-      subject: 'Physics',
-      content: 'First Law: Object at rest stays at rest, Second Law: F = ma, Third Law: Action-reaction...',
-      date: '2024-01-14',
-      tags: ['mechanics', 'forces', 'exam'],
-      lastModified: '3 days ago'
-    },
-    {
-      id: 3,
-      title: 'Chemical Bonding Types',
-      subject: 'Chemistry',
-      content: 'Ionic bonds: metal + non-metal, Covalent bonds: sharing electrons, Metallic bonds...',
-      date: '2024-01-13',
-      tags: ['chemistry', 'bonds', 'molecules'],
-      lastModified: '4 days ago'
-    },
-    {
-      id: 4,
-      title: 'Photosynthesis Process',
-      subject: 'Biology',
-      content: '6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂, Light reactions, Calvin cycle...',
-      date: '2024-01-12',
-      tags: ['biology', 'plants', 'energy'],
-      lastModified: '5 days ago'
+  // Fetch notes from your API/database
+  const fetchNotes = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Replace this with your actual API endpoint
+      const response = await fetch('/api/notes');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch notes');
+      }
+      
+      const data = await response.json();
+      setNotes(data.notes || []);
+      
+    } catch (err) {
+      console.error('Error fetching notes:', err);
+      setError('Failed to load notes. Please try again later.');
+      // Set empty array as fallback
+      setNotes([]);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
-  const subjects = [
-    { name: 'All Subjects', count: notes.length, color: 'bg-gray-500' },
-    { name: 'Mathematics', count: 1, color: 'bg-blue-500' },
-    { name: 'Physics', count: 1, color: 'bg-green-500' },
-    { name: 'Chemistry', count: 1, color: 'bg-purple-500' },
-    { name: 'Biology', count: 1, color: 'bg-orange-500' }
-  ];
+  // Calculate subjects dynamically from notes
+  const calculateSubjects = (notesList: Note[]) => {
+    const subjectCounts: { [key: string]: number } = {};
+    
+    notesList.forEach(note => {
+      subjectCounts[note.subject] = (subjectCounts[note.subject] || 0) + 1;
+    });
+
+    const subjectColors = [
+      'bg-blue-500',
+      'bg-green-500', 
+      'bg-purple-500',
+      'bg-orange-500',
+      'bg-red-500',
+      'bg-indigo-500',
+      'bg-pink-500',
+      'bg-teal-500'
+    ];
+
+    const calculatedSubjects: Subject[] = [
+      { name: 'All Subjects', count: notesList.length, color: 'bg-gray-500' }
+    ];
+
+    Object.entries(subjectCounts).forEach(([subject, count], index) => {
+      calculatedSubjects.push({
+        name: subject,
+        count,
+        color: subjectColors[index % subjectColors.length]
+      });
+    });
+
+    return calculatedSubjects;
+  };
+
+  // Load data on component mount
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  // Update subjects when notes change
+  useEffect(() => {
+    setSubjects(calculateSubjects(notes));
+  }, [notes]);
 
   const getSubjectColor = (subject: string) => {
-    switch (subject) {
-      case 'Mathematics': return 'bg-blue-100 text-blue-800';
-      case 'Physics': return 'bg-green-100 text-green-800';
-      case 'Chemistry': return 'bg-purple-100 text-purple-800';
-      case 'Biology': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const colorMap: { [key: string]: string } = {
+      'Mathematics': 'bg-blue-100 text-blue-800',
+      'Physics': 'bg-green-100 text-green-800',
+      'Chemistry': 'bg-purple-100 text-purple-800',
+      'Biology': 'bg-orange-100 text-orange-800',
+      'History': 'bg-red-100 text-red-800',
+      'English': 'bg-indigo-100 text-indigo-800',
+      'Geography': 'bg-teal-100 text-teal-800',
+      'Computer Science': 'bg-pink-100 text-pink-800',
+    };
+    
+    return colorMap[subject] || 'bg-gray-100 text-gray-800';
   };
 
   const filteredNotes = notes.filter(note =>
     note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     note.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    note.subject.toLowerCase().includes(searchTerm.toLowerCase())
+    note.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    note.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // AI Improvement Function
+  const improveNote = async (noteToImprove: Note) => {
+    if (!noteToImprove?.content) {
+      alert('No note content to improve');
+      return;
+    }
+
+    setIsImproving(true);
+    
+    try {
+      const response = await fetch('/api/improve-note', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ note: noteToImprove.content }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update the note with improved content
+        setNotes(prevNotes => 
+          prevNotes.map(note => 
+            note.id === noteToImprove.id 
+              ? { ...note, content: data.improved, lastModified: 'just now' }
+              : note
+          )
+        );
+        
+        // Optionally update the note in your database
+        await updateNoteInDatabase(noteToImprove.id, data.improved);
+        
+        alert('✅ Note improved successfully and saved!');
+        setShowImproveModal(false);
+      } else {
+        alert(`❌ Error: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Failed to improve note:', error);
+      alert('❌ Failed to contact AI service. Please try again.');
+    } finally {
+      setIsImproving(false);
+    }
+  };
+
+  // Function to update note in your database
+  const updateNoteInDatabase = async (noteId: string | number, improvedContent: string) => {
+    try {
+      await fetch(`/api/notes/${noteId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: improvedContent }),
+      });
+    } catch (error) {
+      console.error('Failed to update note in database:', error);
+    }
+  };
+
+  // Calculate statistics dynamically
+  const getStatistics = () => {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const thisWeekNotes = notes.filter(note => {
+      const noteDate = new Date(note.date);
+      return noteDate >= oneWeekAgo;
+    });
+
+    const lastUpdatedNote = notes.reduce((latest, note) => {
+      const noteDate = new Date(note.date);
+      const latestDate = latest ? new Date(latest.date) : new Date(0);
+      return noteDate > latestDate ? note : latest;
+    }, null as Note | null);
+
+    return {
+      total: notes.length,
+      thisWeek: thisWeekNotes.length,
+      lastUpdated: lastUpdatedNote?.lastModified || 'N/A'
+    };
+  };
+
+  const stats = getStatistics();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-[#0071c5] via-[#004494] to-[#002c5f] rounded-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2 flex items-center">
+                <BookOpen className="h-8 w-8 mr-3" />
+                My Notes
+              </h1>
+              <p className="text-[#a8d4f0]">Loading your notes...</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-[#0071c5]" />
+          <span className="ml-2 text-lg">Loading notes...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-[#0071c5] via-[#004494] to-[#002c5f] rounded-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2 flex items-center">
+                <BookOpen className="h-8 w-8 mr-3" />
+                My Notes
+              </h1>
+              <p className="text-[#a8d4f0]">Review and organize your lesson notes and summaries</p>
+            </div>
+          </div>
+        </div>
+        <Card className="text-center py-12">
+          <CardContent>
+            <div className="text-red-500 mb-4">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <h3 className="text-lg font-semibold mb-2">Error Loading Notes</h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <Button onClick={fetchNotes} className="bg-[#0071c5] hover:bg-[#004494]">
+                Try Again
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -130,7 +320,7 @@ const StudentNotes: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Quick Stats */}
+          {/* Dynamic Stats */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Statistics</CardTitle>
@@ -138,15 +328,15 @@ const StudentNotes: React.FC = () => {
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600 dark:text-slate-400">Total Notes</span>
-                <span className="font-semibold">{notes.length}</span>
+                <span className="font-semibold">{stats.total}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600 dark:text-slate-400">This Week</span>
-                <span className="font-semibold">3</span>
+                <span className="font-semibold">{stats.thisWeek}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600 dark:text-slate-400">Last Updated</span>
-                <span className="font-semibold text-[#0071c5]">{notes[0]?.lastModified}</span>
+                <span className="font-semibold text-[#0071c5]">{stats.lastUpdated}</span>
               </div>
             </CardContent>
           </Card>
@@ -177,6 +367,22 @@ const StudentNotes: React.FC = () => {
                       <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
                         <Edit className="h-4 w-4" />
                       </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-8 w-8 p-0 text-yellow-500 hover:text-yellow-700"
+                        onClick={() => {
+                          setSelectedNote(note);
+                          setShowImproveModal(true);
+                        }}
+                        disabled={isImproving}
+                      >
+                        {isImproving && selectedNote?.id === note.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
+                      </Button>
                       <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500 hover:text-red-700">
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -203,7 +409,7 @@ const StudentNotes: React.FC = () => {
             ))}
           </div>
 
-          {filteredNotes.length === 0 && (
+          {filteredNotes.length === 0 && !isLoading && (
             <Card className="text-center py-12">
               <CardContent>
                 <BookOpen className="h-12 w-12 text-slate-400 mx-auto mb-4" />
@@ -220,6 +426,51 @@ const StudentNotes: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* AI Improvement Confirmation Modal */}
+      {showImproveModal && selectedNote && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Sparkles className="h-5 w-5 mr-2 text-yellow-500" />
+                Improve Note with AI
+              </CardTitle>
+              <CardDescription>
+                This will improve the note "{selectedNote.title}" using AI and save it to Notion.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex space-x-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowImproveModal(false)}
+                  disabled={isImproving}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white flex-1"
+                  onClick={() => improveNote(selectedNote)}
+                  disabled={isImproving}
+                >
+                  {isImproving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Improving...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Improve with AI
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
