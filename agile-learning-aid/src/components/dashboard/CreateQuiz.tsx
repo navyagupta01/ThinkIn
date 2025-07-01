@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PlusCircle, Trash2, Save, Eye, Clock, Target, BookOpen, Users, Edit, Play } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import TeacherChatAssistant from './TeacherChatAssistant';
+
 
 
 interface Option {
@@ -37,7 +39,6 @@ interface QuizForm {
   questions: Question[];
 }
 
-const subjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'English', 'History'];
 const difficulties = ['Easy', 'Medium', 'Hard'];
 
 const CreateQuiz: React.FC = () => {
@@ -207,7 +208,7 @@ const CreateQuiz: React.FC = () => {
 
       const quizPayload: any = {
         title: quizData.title.trim(),
-        subject: quizData.subject,
+        subject: quizData.subject.trim(),
         description: quizData.description.trim(),
         duration: Number(quizData.duration),
         difficulty: quizData.difficulty,
@@ -406,20 +407,12 @@ const CreateQuiz: React.FC = () => {
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">Subject</label>
-              <Select 
-                value={quizData.subject} 
-                onValueChange={(value) => handleInputChange('subject', value)}
+              <Input
+                value={quizData.subject}
+                onChange={(e) => handleInputChange('subject', e.target.value)}
+                placeholder="Enter subject"
                 disabled={loading}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select subject" />
-                </SelectTrigger>
-                <SelectContent>
-                  {subjects.map((subject) => (
-                    <SelectItem key={subject} value={subject}>{subject}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">Description</label>
@@ -693,6 +686,7 @@ const CreateQuiz: React.FC = () => {
               ))}
             </div>
           )}
+  <TeacherChatAssistant />
         </CardContent>
       </Card>
     </div>

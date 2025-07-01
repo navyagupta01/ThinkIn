@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageCircle, Send, Bot, User, Lightbulb, BookOpen, Users, BarChart3 } from 'lucide-react';
-
+import TeacherChatAssistant from './TeacherChatAssistant';
 interface Message {
   id: number;
   text: string;
@@ -263,6 +263,7 @@ const TeacherChatbot: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+        <TeacherChatAssistant />
       </div>
     </div>
   );

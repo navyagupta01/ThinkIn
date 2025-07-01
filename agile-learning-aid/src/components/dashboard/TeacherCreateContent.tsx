@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { PlusCircle, FileText, Video, Image, BookOpen, Edit3 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import TeacherChatAssistant from './TeacherChatAssistant';
 import { toast } from '@/hooks/use-toast';
 
 interface FormData {
@@ -314,6 +315,7 @@ const TeacherCreateContent: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      <TeacherChatAssistant />
     </div>
   );
 };

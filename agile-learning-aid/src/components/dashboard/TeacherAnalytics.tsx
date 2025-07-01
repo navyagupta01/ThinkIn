@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import axios from 'axios';
+import TeacherChatAssistant from './TeacherChatAssistant';
 
 interface Quiz {
   quizId: string;
@@ -350,6 +351,7 @@ const TeacherAnalytics: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+        <TeacherChatAssistant />
     </div>
   );
 };

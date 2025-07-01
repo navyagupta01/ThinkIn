@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, CheckCircle, AlertCircle, Play, BarChart3, Calendar, Target, Eye } from 'lucide-react';
+import { Trophy, Clock, CheckCircle, Play, BarChart3, Calendar, Target, Eye } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface Quiz {
@@ -27,7 +27,7 @@ interface Quiz {
 
 interface Attempt {
   attemptId: string;
-  quizId: { title: string; subject: string; _id: string };
+  quizId: { title: string; subject: string; _id: string } | null; // Allow quizId to be null
   score: number;
   maxScore: number;
   percentage: number;
@@ -197,13 +197,17 @@ const StudentQuizzes: React.FC = () => {
   };
 
   const getSubjectColor = (subject: string) => {
-    switch (subject) {
-      case 'Mathematics': return 'bg-blue-100 text-blue-800';
-      case 'Physics': return 'bg-green-100 text-green-800';
-      case 'Chemistry': return 'bg-purple-100 text-purple-800';
-      case 'Biology': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const colors = [
+      'bg-blue-100 text-blue-800',
+      'bg-green-100 text-green-800',
+      'bg-purple-100 text-purple-800',
+      'bg-orange-100 text-orange-800',
+      'bg-pink-100 text-pink-800',
+      'bg-teal-100 text-teal-800',
+      'bg-indigo-100 text-indigo-800'
+    ];
+    const hash = subject.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
   };
 
   const getGradeColor = (percentage: number) => {
@@ -219,6 +223,13 @@ const StudentQuizzes: React.FC = () => {
     { label: 'Average Score', value: attempts?.length ? `${Math.round(attempts.reduce((sum: number, a: Attempt) => sum + a.percentage, 0) / attempts.length)}%` : '0%', icon: Target, color: 'text-blue-600' },
     { label: 'Best Score', value: attempts?.length ? `${Math.max(...attempts.map((a: Attempt) => a.percentage))}%` : '0%', icon: Trophy, color: 'text-purple-600' },
   ];
+
+  // Get unique subjects from available quizzes (not just completed attempts)
+  const subjects = Array.from(
+    new Set(
+      quizzes?.map((quiz: Quiz) => quiz.subject).filter((subject): subject is string => typeof subject === 'string') || []
+    )
+  );
 
   if (quizzesLoading || attemptsLoading) return <div>Loading...</div>;
   if (quizzesError || attemptsError) {
@@ -394,30 +405,53 @@ const StudentQuizzes: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {['Mathematics', 'Physics', 'Chemistry'].map((subject) => {
-                  const subjectAttempts = attempts?.filter((a: Attempt) => a.quizId?.subject === subject) || [];
-                  const avgScore = subjectAttempts.length
-                    ? Math.round(
-                        subjectAttempts.reduce((sum: number, a: Attempt) => sum + a.percentage, 0) /
-                          subjectAttempts.length
-                      )
-                    : 0;
-                  return (
-                    <div key={subject}>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>{subject}</span>
-                        <span className="text-[#0071c5] font-medium">{avgScore}%</span>
+              <div className="space-y-4 max-h-64 overflow-y-auto">
+                {subjects.length === 0 ? (
+                  <p className="text-gray-600">No subjects available.</p>
+                ) : (
+                  subjects.map((subject) => {
+                    // Get all quizzes for this subject
+                    const subjectQuizzes = quizzes?.filter((quiz: Quiz) => quiz.subject === subject) || [];
+                    
+                    // Get completed attempts for this subject
+                    const subjectAttempts = attempts?.filter((a: Attempt) => a.quizId?.subject === subject) || [];
+                    
+                    // Calculate progress: completed quizzes / total quizzes * 100
+                    const completedQuizzes = subjectAttempts.length;
+                    const totalQuizzes = subjectQuizzes.length;
+                    const progressPercentage = totalQuizzes > 0 ? Math.round((completedQuizzes / totalQuizzes) * 100) : 0;
+                    
+                    // Calculate average score for completed quizzes
+                    const avgScore = subjectAttempts.length
+                      ? Math.round(
+                          subjectAttempts.reduce((sum: number, a: Attempt) => sum + a.percentage, 0) /
+                            subjectAttempts.length
+                        )
+                      : 0;
+                    
+                    return (
+                      <div key={subject as string}>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="font-medium">{subject as string}</span>
+                          <span className="text-[#0071c5] font-medium">
+                            {completedQuizzes}/{totalQuizzes} ({progressPercentage}%)
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mb-2">
+                          <div
+                            className="bg-[#0071c5] h-2 rounded-full"
+                            style={{ width: `${progressPercentage}%` }}
+                          ></div>
+                        </div>
+                        {subjectAttempts.length > 0 && (
+                          <div className="text-xs text-slate-600 dark:text-slate-400">
+                            Average Score: {avgScore}%
+                          </div>
+                        )}
                       </div>
-                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                        <div
-                          className="bg-[#0071c5] h-2 rounded-full"
-                          style={{ width: `${avgScore}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </CardContent>
           </Card>
@@ -487,14 +521,6 @@ const StudentQuizzes: React.FC = () => {
                     </div>
                     <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400">
                       <span>Completed {new Date(attempt.submittedAt).toLocaleDateString()}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate(`/results/${attempt.attemptId}`)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View Details
-                      </Button>
                     </div>
                   </div>
                 </div>

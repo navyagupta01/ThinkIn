@@ -73,7 +73,7 @@ SPECIAL FEATURES:
 Always aim to inspire curiosity and love of learning!`;
 
   const quickSuggestions = [
-    { icon: Calculator, text: "Help with math problem", color: "text-blue-600" },
+    { icon: Calculator, text: "Help with math", color: "text-blue-600" },
     { icon: BookOpen, text: "Explain a concept", color: "text-green-600" },
     { icon: Brain, text: "Study strategies", color: "text-purple-600" },
     { icon: Lightbulb, text: "Essay writing tips", color: "text-orange-600" },

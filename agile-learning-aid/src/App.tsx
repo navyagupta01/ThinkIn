@@ -15,6 +15,7 @@ import Dashboard from '@/pages/Dashboard';
 import Profile from '@/pages/Profile';
 import NotFound from './pages/NotFound';
 import StudentLiveClasses from './components/dashboard/StudentLiveClass';
+import StudentDiscussion from './components/dashboard/StudentDiscussion';
 import StudentResources from './components/dashboard/StudentResources';
 import StudentNotes from './components/dashboard/StudentNotes';
 import StudentQuizzes from './components/dashboard/StudentQuizzes';
@@ -54,6 +55,11 @@ const App = () => (
                       <Dashboard />
                     </ProtectedRoute>
                   } />
+                  <Route path='/discussion' element={
+                    <ProtectedRoute>
+                      <StudentDiscussion />
+                    </ProtectedRoute>
+                  }></Route>
                   <Route path="/profile" element={
                     <ProtectedRoute>
                       <Profile />

@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
+  MessageSquareMore ,
   Home,
   BookOpen,
   Calendar,
@@ -32,18 +33,25 @@ interface SidebarProps {
   onToggleCollapse: () => void;
 }
 
+
+
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleLogoClick = () => {
+    navigate('/dashboard');
+  };
+
   if (!user) return null;
 
   const studentMenuItems = [
-    { icon: Home, label: 'Dashboard', path: '/dashboard' },
+    { icon: MessageSquareMore, label: "Dashboard", path: '/dashboard'},
+    { icon: Home, label: 'Disucssion Board', path: '/discussion' },
     { icon: Users, label: 'Live Classes', path: '/live' },
     { icon: BookOpen, label: 'Resources', path: '/resources' },
-    { icon: Bot, label: 'AI Assistant', path: '/chatbot' },
+    { icon: Bot, label: 'AI Teacher', path: '/chatbot' },
     { icon: NotebookPen, label: 'Notes', path: '/notes' },
     { icon: Trophy, label: 'Quizzes', path: '/quizzes' },
   ];
@@ -96,36 +104,39 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed, onToggl
             isCollapsed ? 'w-20' : 'w-72'
           )}
         >
-        {/* Logo Section */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-[#0071c5] to-[#004494] rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-lg">AI</span>
-              </div>
-              {!isCollapsed && (
-                <span className="text-xl font-bold bg-gradient-to-r from-[#0071c5] to-[#004494] bg-clip-text text-transparent whitespace-nowrap">
-                  ThinkIN
-                </span>
-              )}
-            </div>
-            {/* Mobile close button */}
-            <button 
-              onClick={onClose}
-              className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            {/* Desktop collapse toggle */}
-            <button 
-              onClick={onToggleCollapse}
-              className="hidden lg:block p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
-            >
-              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </button>
-          </div>
-        </div>
-
+  <div className="flex items-center justify-between">
+    {/* Logo and Collapse Button for Desktop */}
+    <div className="flex items-center space-x-4 w-full"> {/* Changed space-x-2 to space-x-4 */}
+      <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLogoClick}>
+        <img 
+          src="/favicon.ico" 
+          alt="ThinkIN Logo" 
+          className="w-8 h-8 object-contain"
+        />
+        {!isCollapsed && (
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+            ThinkIN
+          </h1>
+        )}
+      </div>
+      {/* Desktop collapse toggle */}
+      <button 
+        onClick={onToggleCollapse}
+        className="hidden lg:block p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg ml-auto"
+      >
+        {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+      </button>
+    </div>
+    {/* Mobile close button */}
+    <button 
+      onClick={onClose}
+      className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+    >
+      <X className="h-5 w-5" />
+    </button>
+  </div>
+</div>
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
           <div className="space-y-2">

@@ -1,7 +1,5 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -10,7 +8,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Menu, User, Settings, LogOut, Globe } from 'lucide-react';
+import { Menu, User, Settings, LogOut } from 'lucide-react';
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
@@ -19,12 +17,15 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar, showSidebarToggle = true }) => {
   const { user, logout } = useAuth();
-  const { currentLanguage, setLanguage, languages } = useLanguage();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleLogoClick = () => {
+    navigate('/dashboard');
   };
 
   return (
@@ -42,10 +43,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, showSidebarToggle = tr
             </Button>
           )}
           
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-intel-blue rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">AI</span>
-            </div>
+          <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLogoClick}>
+            {/* Replace this div with your logo image */}
+            <img 
+              src="/favicon.ico" 
+              alt="ThinkIN Logo" 
+              className="w-8 h-8 object-contain"
+            />
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               ThinkIN
             </h1>
@@ -53,29 +57,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, showSidebarToggle = tr
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* Language Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                <Globe className="h-4 w-4" />
-                <span className="hidden sm:inline">
-                  {languages.find(lang => lang.code === currentLanguage)?.nativeName}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {languages.map((language) => (
-                <DropdownMenuItem
-                  key={language.code}
-                  onClick={() => setLanguage(language.code)}
-                  className={currentLanguage === language.code ? 'bg-intel-lightblue dark:bg-intel-blue' : ''}
-                >
-                  {language.nativeName} ({language.name})
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           {/* Profile Dropdown */}
           {user && (
             <DropdownMenu>

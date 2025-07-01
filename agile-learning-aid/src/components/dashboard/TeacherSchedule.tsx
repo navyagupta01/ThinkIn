@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, Users, Plus, CalendarDays, MapPin } from 'lucide-react';
+import TeacherChatAssistant from './TeacherChatAssistant';
 
 const TeacherSchedule: React.FC = () => {
   const [selectedView, setSelectedView] = useState<'week' | 'month'>('week');
@@ -235,6 +236,7 @@ const TeacherSchedule: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      <TeacherChatAssistant />
     </div>
   );
 };
