@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageCircle, Send, Bot, User, Lightbulb, BookOpen, Users, BarChart3 } from 'lucide-react';
-import TeacherChatAssistant from './TeacherChatAssistant';
+import { toast } from '@/hooks/use-toast';
+
 interface Message {
   id: number;
   text: string;
@@ -11,13 +12,18 @@ interface Message {
   timestamp: Date;
 }
 
-type ContextStage = 'idle' | 'awaiting_subject' | 'awaiting_duration' | 'ready';
+type ContextStage = 'idle' | 'awaiting_subject' | 'awaiting_duration' | 'ready' | 'awaiting_lesson_title';
+
+interface FormData {
+  title: string;
+  subject: string;
+}
 
 const TeacherChatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hello! I'm your AI teaching assistant. I can help you with lesson planning, student engagement strategies, assessment creation, and more. What would you like assistance with today?",
+      text: "Hello! I'm your AI teaching assistant. I can help you create lesson plans, suggest student engagement strategies, design assessments, and more. What would you like assistance with today?",
       sender: 'bot',
       timestamp: new Date()
     }
@@ -28,6 +34,7 @@ const TeacherChatbot: React.FC = () => {
   const [contextStage, setContextStage] = useState<ContextStage>('idle');
   const [lessonSubject, setLessonSubject] = useState('');
   const [lessonDuration, setLessonDuration] = useState('');
+  const [formData, setFormData] = useState<FormData>({ title: '', subject: '' });
 
   const quickPrompts = [
     {
@@ -35,9 +42,9 @@ const TeacherChatbot: React.FC = () => {
       icon: BookOpen,
       color: 'bg-blue-500',
       prompts: [
-        'Create a lesson plan for advanced algebra',
-        'Suggest interactive activities for physics',
-        'Help me design a chemistry lab experiment'
+        'Create a lesson plan',
+        'Suggest activities for a science lesson',
+        'Help me design a history lesson outline'
       ]
     },
     {
@@ -95,7 +102,15 @@ const TeacherChatbot: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
 
+    if (contextStage === 'awaiting_lesson_title') {
+      setFormData({ ...formData, title: inputText });
+      setContextStage('awaiting_subject');
+      addBotMessage('Great! What subject is this lesson plan for?');
+      return;
+    }
+
     if (contextStage === 'awaiting_subject') {
+      setFormData({ ...formData, subject: inputText });
       setLessonSubject(inputText);
       setContextStage('awaiting_duration');
       addBotMessage('Got it! How long is the class (in minutes)?');
@@ -105,12 +120,48 @@ const TeacherChatbot: React.FC = () => {
     if (contextStage === 'awaiting_duration') {
       setLessonDuration(inputText);
       setContextStage('ready');
-      addBotMessage(`Subject: ${lessonSubject}\nDuration: ${inputText} mins\nGenerating full lesson plan...`);
+      setLoading(true);
+
+      try {
+        const response = await fetch('http://localhost:5009/api/content', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title: formData.title,
+            subject: lessonSubject,
+            type: 'LessonPlan',
+            duration: inputText
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to create lesson plan');
+        }
+
+        toast({
+          title: 'Success',
+          description: 'Lesson plan created successfully'
+        });
+        addBotMessage(`Lesson plan created!\nTitle: ${formData.title}\nSubject: ${lessonSubject}\nDuration: ${inputText} mins`);
+        setFormData({ title: '', subject: '' });
+        setLessonSubject('');
+        setLessonDuration('');
+        setContextStage('idle');
+      } catch (error: any) {
+        addBotMessage(error.message || 'Error creating lesson plan');
+        toast({ title: 'Error', description: error.message || 'Error creating lesson plan', variant: 'destructive' });
+      } finally {
+        setLoading(false);
+      }
+      return;
     }
 
-    if (contextStage === 'idle' && /lesson plan|make a plan/i.test(inputText)) {
-      setContextStage('awaiting_subject');
-      addBotMessage('Sure! What subject is the lesson for?');
+    if (contextStage === 'idle' && /lesson plan|make a plan|create a lesson plan/i.test(inputText)) {
+      setContextStage('awaiting_lesson_title');
+      addBotMessage('Sure! What’s the title of your lesson plan?');
       return;
     }
 
@@ -120,18 +171,18 @@ const TeacherChatbot: React.FC = () => {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer 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',
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://yourwebsite.com',
-            'X-Title': 'EduChatbot'
-          },
+          'Authorization': 'Bearer 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',
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://yourwebsite.com',
+          'X-Title': 'EduChatbot'
+        },
         body: JSON.stringify({
           model: 'mistralai/mixtral-8x7b-instruct',
           messages: [
             {
               role: 'system',
               content:
-                "You are EduChatBot, a friendly AI education assistant.\nRespond with clear formatting: use paragraphs, line breaks, and numbered or bulleted lists when appropriate.\nOnly provide full lesson plans when you know the subject and class duration."
+                "You are EduChatBot, a friendly AI education assistant.\nRespond with clear formatting: use paragraphs, line breaks, and numbered or bulleted lists when appropriate.\nOnly provide full lesson plans when you know the title, subject, and class duration."
             },
             ...messages.map((msg) => ({
               role: msg.sender === 'user' ? 'user' : 'assistant',
@@ -163,7 +214,7 @@ const TeacherChatbot: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-intel-darkblue to-intel-blue rounded-2xl p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">AI Teaching Assistant 🤖</h1>
+        <h1 className="text-3xl font-bold mb19-2">AI Teaching Assistant 🤖</h1>
         <p className="text-blue-100">Get personalized help with lesson planning, student engagement, and more</p>
       </div>
 
@@ -263,7 +314,6 @@ const TeacherChatbot: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <TeacherChatAssistant />
       </div>
     </div>
   );

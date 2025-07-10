@@ -11,6 +11,7 @@ const LessonPlanGenerator: React.FC = () => {
   const [topic, setTopic] = useState<string>('');
   const [sessions, setSessions] = useState<number>(4);
   const [details, setDetails] = useState<string>('');
+  const [syllabus, setSyllabus] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
@@ -29,7 +30,7 @@ const LessonPlanGenerator: React.FC = () => {
       const response = await fetch('http://localhost:5001/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, sessions, details }),
+        body: JSON.stringify({ topic, sessions, details, syllabus }),
       });
 
       if (!response.ok) {
@@ -86,7 +87,7 @@ const LessonPlanGenerator: React.FC = () => {
             Lesson Plan Generator
           </CardTitle>
           <CardDescription>
-            Generate teaching slides from a simple plan of action.
+            Generate teaching slides from a simple plan of action or a specific syllabus.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -116,6 +117,19 @@ const LessonPlanGenerator: React.FC = () => {
               value={sessions}
               onChange={(e) => setSessions(parseInt(e.target.value) || 1)}
               className="w-full"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="syllabus" className="text-sm font-medium">
+              Syllabus (optional)
+            </Label>
+            <Textarea
+              id="syllabus"
+              value={syllabus}
+              onChange={(e) => setSyllabus(e.target.value)}
+              placeholder="e.g. Unit 1: Cell Structure, Unit 2: Photosynthesis Process, Unit 3: Plant Systems"
+              className="w-full h-24"
             />
           </div>
 

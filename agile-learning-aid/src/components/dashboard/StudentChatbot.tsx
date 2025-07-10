@@ -36,7 +36,7 @@ const StudentChatbot = () => {
       }
     };
     checkConnection();
-    const interval = setInterval(checkConnection, 5000);
+    const interval = setInterval(checkConnection, 5050);
     return () => clearInterval(interval);
   }, []);
 

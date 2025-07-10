@@ -130,31 +130,32 @@ const TeacherAnalytics: React.FC = () => {
             <p className="text-blue-100">Monitor student progress and quiz performance</p>
           </div>
           <div className="flex space-x-2">
-            <Button
-              size="sm"
-              variant={selectedPeriod === 'week' ? 'secondary' : 'outline'}
-              onClick={() => setSelectedPeriod('week')}
-              className="text-white border-white"
-            >
-              Week
-            </Button>
-            <Button
-              size="sm"
-              variant={selectedPeriod === 'month' ? 'secondary' : 'outline'}
-              onClick={() => setSelectedPeriod('month')}
-              className="text-white border-white"
-            >
-              Month
-            </Button>
-            <Button
-              size="sm"
-              variant={selectedPeriod === 'semester' ? 'secondary' : 'outline'}
-              onClick={() => setSelectedPeriod('semester')}
-              className="text-white border-white"
-            >
-              Semester
-            </Button>
-          </div>
+  <Button
+    size="sm"
+    variant={selectedPeriod === 'week' ? 'secondary' : 'outline'}
+    onClick={() => setSelectedPeriod('week')}
+    className="bg-blue-200 text-black border-blue-200"
+  >
+    Week
+  </Button>
+  <Button
+    size="sm"
+    variant={selectedPeriod === 'month' ? 'secondary' : 'outline'}
+    onClick={() => setSelectedPeriod('month')}
+    className="bg-blue-200 text-black border-blue-200"
+  >
+    Month
+  </Button>
+  <Button
+    size="sm"
+    variant={selectedPeriod === 'semester' ? 'secondary' : 'outline'}
+    onClick={() => setSelectedPeriod('semester')}
+    className="bg-blue-200 text-black border-blue-200"
+  >
+    Semester
+  </Button>
+</div>
+
         </div>
       </div>
 
@@ -167,7 +168,7 @@ const TeacherAnalytics: React.FC = () => {
       )}
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -194,7 +195,7 @@ const TeacherAnalytics: React.FC = () => {
               </Card>
             );
           })}
-        </div>
+        </div> */}
 
       {/* Quiz Selector */}
       <Card>
@@ -332,21 +333,9 @@ const TeacherAnalytics: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            <Button className="bg-intel-blue hover:bg-intel-darkblue">
-              <Filter className="h-4 w-4 mr-2" />
-              Generate Custom Report
-            </Button>
             <Button onClick={exportToCSV} disabled={!analytics} variant="outline" className="border-intel-blue text-intel-blue">
               <Download className="h-4 w-4 mr-2" />
               Export All Data
-            </Button>
-            <Button variant="outline" className="border-intel-blue text-intel-blue">
-              <Clock className="h-4 w-4 mr-2" />
-              Schedule Review Meeting
-            </Button>
-            <Button variant="outline" className="border-intel-blue text-intel-blue">
-              <Users className="h-4 w-4 mr-2" />
-              Contact Students
             </Button>
           </div>
         </CardContent>

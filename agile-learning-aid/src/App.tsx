@@ -14,20 +14,24 @@ import Signup from '@/pages/Signup';
 import Dashboard from '@/pages/Dashboard';
 import Profile from '@/pages/Profile';
 import NotFound from './pages/NotFound';
-import StudentLiveClasses from './components/dashboard/StudentLiveClass';
+import StudentMeetingJoin from './components/dashboard/StudentMeetingJoin';
 import StudentDiscussion from './components/dashboard/StudentDiscussion';
 import StudentResources from './components/dashboard/StudentResources';
 import StudentNotes from './components/dashboard/StudentNotes';
 import StudentQuizzes from './components/dashboard/StudentQuizzes';
 import TeacherCreateContent from './components/dashboard/TeacherCreateContent';
-import TeacherSchedule from './components/dashboard/TeacherSchedule';
+import TeacherMeetingManager from './components/dashboard/TeacherMeetingManager';
 import TeacherAnalytics from './components/dashboard/TeacherAnalytics';
+import TeacherDashboard from './components/dashboard/TeacherDashboard';
+import TeacherDiscussion from './components/dashboard/TeacherDiscussion';
 import TeacherChatbot from './components/dashboard/TeacherChatbot';
 import LessonPlanGenerator from './components/dashboard/LessonPlanGenerator';
 import EditContent from './components/dashboard/EditContent';
 import CreateQuiz from './components/dashboard/CreateQuiz';
 import ChatbotWrapper from './components/dashboard/ChatbotWrapper';
 import SWOTAnalysis from './components/dashboard/SWOTAnalysis';
+import Assignments from './components/dashboard/Assignments';
+import TeacherAIGradeView from './components/dashboard/TeacherAIGradeView';
 
 const HomeRedirect = () => {
   const { user } = useAuth();
@@ -55,20 +59,36 @@ const App = () => (
                       <Dashboard />
                     </ProtectedRoute>
                   } />
-                  <Route path='/discussion' element={
+                  <Route path="/assignments" element={
+                    <ProtectedRoute>
+                      <Assignments />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/teacher-ai-grades" element={
+                    <ProtectedRoute allowedRoles={['teacher']}>
+                      <TeacherAIGradeView />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/discussion" element={
                     <ProtectedRoute>
                       <StudentDiscussion />
                     </ProtectedRoute>
-                  }></Route>
+                  }>
+                    <Route path="teacher/discussion" element={
+                      <ProtectedRoute allowedRoles={['teacher']}>
+                        <TeacherDiscussion />
+                      </ProtectedRoute>
+                    } />
+                  </Route>
                   <Route path="/profile" element={
                     <ProtectedRoute>
                       <Profile />
                     </ProtectedRoute>
                   } />
                   {/* Student Routes */}
-                  <Route path="/live" element={
+                  <Route path="/meetings/student" element={
                     <ProtectedRoute allowedRoles={['student']}>
-                      <StudentLiveClasses />
+                      <StudentMeetingJoin />
                     </ProtectedRoute>
                   } />
                   <Route path="/resources" element={
@@ -112,9 +132,9 @@ const App = () => (
                       <EditContent />
                     </ProtectedRoute>
                   } />
-                  <Route path="/schedule" element={
+                  <Route path="/meetings/teacher" element={
                     <ProtectedRoute allowedRoles={['teacher']}>
-                      <TeacherSchedule />
+                      <TeacherMeetingManager />
                     </ProtectedRoute>
                   } />
                   <Route path="/analytics" element={
@@ -131,6 +151,8 @@ const App = () => (
                   {/* Redirect old paths */}
                   <Route path="/dashboard/student" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/dashboard/teacher" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/schedule" element={<Navigate to="/meetings/teacher" replace />} />
+                  <Route path="/live" element={<Navigate to="/meetings/student" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Layout>

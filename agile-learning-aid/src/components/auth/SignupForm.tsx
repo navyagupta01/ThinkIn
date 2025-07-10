@@ -62,7 +62,7 @@ const SignupForm: React.FC = () => {
       
       toast({
         title: "Account created!",
-        description: "Welcome to ThinkIN. Let's get started!",
+        description: "Welcome to LearnSphere. Let's get started!",
       });
       
       // Add a small delay to ensure the auth context is fully updated
@@ -99,7 +99,7 @@ const SignupForm: React.FC = () => {
           <div className="w-12 h-12 bg-intel-blue rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-lg">AI</span>
           </div>
-          <CardTitle className="text-2xl">Join ThinkIN</CardTitle>
+          <CardTitle className="text-2xl">Join LearnSphere</CardTitle>
           <CardDescription>
             Create your account to get started
           </CardDescription>

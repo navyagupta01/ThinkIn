@@ -47,11 +47,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, showSidebarToggle = tr
             {/* Replace this div with your logo image */}
             <img 
               src="/favicon.ico" 
-              alt="ThinkIN Logo" 
+              alt="LearnSphere Logo" 
               className="w-8 h-8 object-contain"
             />
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              ThinkIN
+              LearnSphere
             </h1>
           </div>
         </div>

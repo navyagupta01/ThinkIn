@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -9,11 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
+import { doc, setDoc } from 'firebase/firestore';
+import { updateProfile } from 'firebase/auth';
+import { db, auth } from '@/lib/firebase';
 import { toast } from '@/hooks/use-toast';
 
 const ProfileSettings: React.FC = () => {
-  const { user } = useAuth();
+  const { user, firebaseUser } = useAuth();
   const { currentLanguage, setLanguage, languages } = useLanguage();
   const { isDarkMode, toggleTheme, fontSize, setFontSize, isHighContrast, toggleHighContrast } = useTheme();
   
@@ -23,12 +24,60 @@ const ProfileSettings: React.FC = () => {
     inApp: true,
     webcam: false,
   });
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveProfile = () => {
-    toast({
-      title: "Profile updated",
-      description: "Your profile settings have been saved successfully.",
-    });
+  const handleSaveProfile = async () => {
+    if (!firebaseUser || !user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update your profile.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!displayName.trim()) {
+      toast({
+        title: "Error",
+        description: "Display name cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Update Firebase Authentication profile
+      await updateProfile(firebaseUser, {
+        displayName: displayName.trim(),
+      });
+
+      // Update Firestore user document
+      await setDoc(
+        doc(db, 'users', firebaseUser.uid),
+        {
+          name: displayName.trim(),
+          email: user.email,
+          role: user.role,
+          // createdAt: user.createdAt || new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      toast({
+        title: "Profile updated",
+        description: "Your display name has been updated successfully.",
+      });
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const fontSizeOptions = [
@@ -59,6 +108,7 @@ const ProfileSettings: React.FC = () => {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Enter your display name"
+                disabled={isSaving}
               />
             </div>
             <div>
@@ -80,32 +130,9 @@ const ProfileSettings: React.FC = () => {
               />
             </div>
           </div>
-          <Button onClick={handleSaveProfile}>Save Changes</Button>
-        </CardContent>
-      </Card>
-
-      {/* Language Preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Language Preferences</CardTitle>
-          <CardDescription>Choose your preferred language for the interface and AI responses</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="language">Interface Language</Label>
-            <Select value={currentLanguage} onValueChange={setLanguage}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                {languages.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code}>
-                    {lang.nativeName} ({lang.name})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Button onClick={handleSaveProfile} disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
         </CardContent>
       </Card>
 
@@ -159,50 +186,6 @@ const ProfileSettings: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Notification Preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Notification Preferences</CardTitle>
-          <CardDescription>Choose how you want to receive notifications</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="emailNotifications">Email Notifications</Label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Receive updates via email</p>
-            </div>
-            <Switch
-              id="emailNotifications"
-              checked={notifications.email}
-              onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, email: checked }))}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="inAppNotifications">In-App Notifications</Label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Show notifications within the app</p>
-            </div>
-            <Switch
-              id="inAppNotifications"
-              checked={notifications.inApp}
-              onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, inApp: checked }))}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="webcamAccess">Webcam Access for Engagement</Label>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Allow webcam for engagement monitoring</p>
-            </div>
-            <Switch
-              id="webcamAccess"
-              checked={notifications.webcam}
-              onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, webcam: checked }))}
-            />
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

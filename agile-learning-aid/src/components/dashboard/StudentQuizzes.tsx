@@ -221,7 +221,7 @@ const StudentQuizzes: React.FC = () => {
     { label: 'Completed', value: attempts?.length || 0, icon: CheckCircle, color: 'text-green-600' },
     { label: 'Pending', value: quizzes?.filter((q: Quiz) => q.canAttempt).length || 0, icon: Clock, color: 'text-yellow-600' },
     { label: 'Average Score', value: attempts?.length ? `${Math.round(attempts.reduce((sum: number, a: Attempt) => sum + a.percentage, 0) / attempts.length)}%` : '0%', icon: Target, color: 'text-blue-600' },
-    { label: 'Best Score', value: attempts?.length ? `${Math.max(...attempts.map((a: Attempt) => a.percentage))}%` : '0%', icon: Trophy, color: 'text-purple-600' },
+    { label: 'Best Score', value: attempts?.length ? `${Math.max(...attempts.map((a: Attempt) => a.percentage)).toFixed(2)}%`  : '0%', icon: Trophy, color: 'text-purple-600' },
   ];
 
   // Get unique subjects from available quizzes (not just completed attempts)
@@ -464,10 +464,6 @@ const StudentQuizzes: React.FC = () => {
               <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/swot')}>
                 <BarChart3 className="h-4 w-4 mr-2" />
                 View SWOT Analysis
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Clock className="h-4 w-4 mr-2" />
-                Practice Mode
               </Button>
             </CardContent>
           </Card>

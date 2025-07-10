@@ -54,7 +54,7 @@ SUBJECT EXPERTISE:
 - Sciences (Physics, Chemistry, Biology, Computer Science)
 - Humanities (History, Literature, Philosophy, Psychology)
 - Study Skills (Note-taking, time management, exam prep)
-- Research & Writing (Citations, structure, critical thinking)
+- Research & Writing (Citations, structure, critical LearnSphereg)
 
 RESPONSE STRUCTURE:
 1. Acknowledge the question positively
@@ -226,7 +226,7 @@ Always aim to inspire curiosity and love of learning!`;
                   <div className="bg-white dark:bg-slate-800 shadow-sm border p-3 rounded-2xl">
                     <div className="flex items-center space-x-2">
                       <Loader2 className="h-4 w-4 animate-spin text-[#0071c5]" />
-                      <p className="text-sm text-gray-600">Thinking...</p>
+                      <p className="text-sm text-gray-600">LearnSphereg...</p>
                     </div>
                   </div>
                 </div>

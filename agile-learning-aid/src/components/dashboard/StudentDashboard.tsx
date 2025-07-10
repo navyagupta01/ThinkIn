@@ -31,7 +31,7 @@ const StudentDashboard: React.FC = () => {
       link: '/discussion',
       gradient: 'from-purple-500 via-purple-600 to-indigo-600',
       bgPattern: 'bg-purple-50',
-      stats: 'Join 500+ active discussions'
+      stats: 'Join other students and teachers for active discussions'
     },
     {
       id: 'live',
@@ -51,7 +51,7 @@ const StudentDashboard: React.FC = () => {
       link: '/resources',
       gradient: 'from-green-500 via-emerald-600 to-teal-600',
       bgPattern: 'bg-green-50',
-      stats: '150+ resources available'
+      stats: 'Teacher uploaded resources available'
     },
     {
       id: 'chatbot',
@@ -66,11 +66,11 @@ const StudentDashboard: React.FC = () => {
     {
       id: 'notes',
       title: 'Smart Notes',
-      description: 'Create, organize, and manage your personal notes with our intelligent note-taking system.',
+      description: 'Create, organize, and manage your personal notes with our note-taking system.',
       icon: StickyNote,
       link: '/notes',
       gradient: 'from-yellow-500 via-orange-500 to-red-500',
-      bgPattern: 'bg-yellow-50',
+      bgPattern: 'bg-white',
       stats: 'Organize your thoughts better'
     },
     {

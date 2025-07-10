@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
-  MessageSquareMore ,
+  MessageSquareMore,
   Home,
   BookOpen,
-  Calendar,
   MessageCircle,
   FileText,
   Settings,
   BarChart3,
   PlusCircle,
-  Clock,
   User,
   LogOut,
   X,
@@ -21,10 +19,13 @@ import {
   Bot,
   NotebookPen,
   Trophy,
-  Menu,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  FilePlus,
+  BarChart2,
+  Video
 } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -32,8 +33,6 @@ interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
-
-
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
@@ -47,9 +46,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed, onToggl
   if (!user) return null;
 
   const studentMenuItems = [
-    { icon: MessageSquareMore, label: "Dashboard", path: '/dashboard'},
-    { icon: Home, label: 'Disucssion Board', path: '/discussion' },
-    { icon: Users, label: 'Live Classes', path: '/live' },
+    { icon: MessageSquareMore, label: "Dashboard", path: '/dashboard' },
+    { icon: FilePlus, label: 'Assignments', path: '/assignments' },
+    { icon: Home, label: 'Discussion Board', path: '/discussion' },
+    { icon: Video, label: 'Meetings', path: '/meetings/student' },
     { icon: BookOpen, label: 'Resources', path: '/resources' },
     { icon: Bot, label: 'AI Teacher', path: '/chatbot' },
     { icon: NotebookPen, label: 'Notes', path: '/notes' },
@@ -58,8 +58,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed, onToggl
 
   const teacherMenuItems = [
     { icon: Home, label: 'Dashboard', path: '/dashboard' },
+    { icon: FilePlus, label: 'Assignments', path: '/assignments' },
+    { icon: BarChart2, label: 'AI Grade Analysis', path: '/teacher-ai-grades' },
+    { icon: Home, label: 'Discussion Board', path: '/discussion/teacher/discussion' },
     { icon: PlusCircle, label: 'Create Content', path: '/create' },
-    { icon: Clock, label: 'Schedule Class', path: '/schedule' },
+    { icon: Video, label: 'Meetings', path: '/meetings/teacher' },
     { icon: Bot, label: 'AI Assistant', path: '/chatbot' },
     { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   ];
@@ -72,8 +75,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed, onToggl
   };
 
   const handleLogout = () => {
+    if (!window.confirm('Are you sure you want to log out?')) return;
     logout?.();
     navigate('/login');
+    toast({ title: 'Success', description: 'Logged out successfully' });
   };
 
   // Get user initials for avatar
@@ -98,47 +103,47 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed, onToggl
 
       {/* Sidebar */}
       <aside
-          className={cn(
-            'h-screen bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col z-50',
-            isOpen ? 'fixed left-0 top-0' : 'hidden lg:sticky lg:top-0 lg:block',
-            isCollapsed ? 'w-20' : 'w-72'
-          )}
-        >
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
-  <div className="flex items-center justify-between">
-    {/* Logo and Collapse Button for Desktop */}
-    <div className="flex items-center space-x-4 w-full"> {/* Changed space-x-2 to space-x-4 */}
-      <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLogoClick}>
-        <img 
-          src="/favicon.ico" 
-          alt="ThinkIN Logo" 
-          className="w-8 h-8 object-contain"
-        />
-        {!isCollapsed && (
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            ThinkIN
-          </h1>
+        className={cn(
+          'h-screen bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col z-50',
+          isOpen ? 'fixed left-0 top-0' : 'hidden lg:sticky lg:top-0 lg:block',
+          isCollapsed ? 'w-20' : 'w-72'
         )}
-      </div>
-      {/* Desktop collapse toggle */}
-      <button 
-        onClick={onToggleCollapse}
-        className="hidden lg:block p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg ml-auto"
       >
-        {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-      </button>
-    </div>
-    {/* Mobile close button */}
-    <button 
-      onClick={onClose}
-      className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
-    >
-      <X className="h-5 w-5" />
-    </button>
-  </div>
-</div>
+        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            {/* Logo and Collapse Button for Desktop */}
+            <div className="flex items-center space-x-4 w-full">
+              <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLogoClick}>
+                <img 
+                  src="/favicon.ico" 
+                  alt="LearnSphere Logo" 
+                  className="w-8 h-8 object-contain"
+                />
+                {!isCollapsed && (
+                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                    LearnSphere
+                  </h1>
+                )}
+              </div>
+              {/* Desktop collapse toggle */}
+              <button 
+                onClick={onToggleCollapse}
+                className="hidden lg:block p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg ml-auto"
+              >
+                {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              </button>
+            </div>
+            {/* Mobile close button */}
+            <button 
+              onClick={onClose}
+              className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
         {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
           <div className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;

@@ -81,7 +81,7 @@ const LoginForm: React.FC = () => {
           </div>
           <CardTitle className="text-2xl">Welcome Back</CardTitle>
           <CardDescription>
-            Sign in to your ThinkIN account
+            Sign in to your LearnSphere account
           </CardDescription>
         </CardHeader>
         
