@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Analysis Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">Assignment Analysis Results</h1>
+    </header>
+    
+    <main class="container mx-auto p-6 flex-grow">
+        <div class="bg-white rounded-lg shadow-lg p-6 space-y-6">
+            <!-- Summary Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Summary</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-medium">Final Score</h3>
+                        <p class="text-2xl font-bold">{{ results.final_score }} / {{ results.max_score }}</p>
+                        <p class="text-gray-600">({{ results.percentage }}%)</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-medium">Filename</h3>
+                        <p>{{ results.filename }}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-medium">Analysis Date</h3>
+                        <p>{{ results.timestamp }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Feedback Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Comprehensive Feedback</h2>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-medium">Overall Assessment</h3>
+                        <p>{{ results.comprehensive_feedback.overall_assessment }}</p>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Strengths</h3>
+                        <ul class="list-disc pl-5">
+                            {% for strength in results.comprehensive_feedback.strengths %}
+                                <li>{{ strength }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Weaknesses</h3>
+                        <ul class="list-disc pl-5">
+                            {% for weakness in results.comprehensive_feedback.weaknesses %}
+                                <li>{{ weakness }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Suggestions</h3>
+                        <ul class="list-disc pl-5">
+                            {% for suggestion in results.comprehensive_feedback.suggestions %}
+                                <li>{{ suggestion }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Visualizations Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Visual Analysis</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% if results.plots.quality_metrics %}
+                        <div>
+                            <h3 class="font-medium mb-2">Quality Metrics</h3>
+                            <img src="data:image/png;base64,{{ results.plots.quality_metrics }}" alt="Quality Metrics" class="w-full rounded-lg">
+                        </div>
+                    {% endif %}
+                    {% if results.plots.criteria_coverage %}
+                        <div>
+                            <h3 class="font-medium mb-2">Criteria Coverage</h3>
+                            <img src="data:image/png;base64,{{ results.plots.criteria_coverage }}" alt="Criteria Coverage" class="w-full rounded-lg">
+                        </div>
+                    {% endif %}
+                    {% if results.plots.word_cloud %}
+                        <div>
+                            <h3 class="font-medium mb-2">Word Frequency</h3>
+                            <img src="data:image/png;base64,{{ results.plots.word_cloud }}" alt="Word Cloud" class="w-full rounded-lg">
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Detailed Metrics Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Detailed Metrics</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-medium">Quality Metrics</h3>
+                        <ul class="list-disc pl-5">
+                            <li>Word Count: {{ results.quality_metrics.word_count }}</li>
+                            <li>Sentence Count: {{ results.quality_metrics.sentence_count }}</li>
+                            <li>Paragraph Count: {{ results.quality_metrics.paragraph_count }}</li>
+                            <li>Average Sentence Length: {{ results.quality_metrics.avg_sentence_length }}</li>
+                            <li>Readability Score: {{ results.quality_metrics.readability_score }}</li>
+                            <li>Grade Level: {{ results.quality_metrics.grade_level }}</li>
+                            <li>Automated Readability Index: {{ results.quality_metrics.automated_readability_index }}</li>
+                            <li>Unique Words: {{ results.quality_metrics.unique_words }}</li>
+                            <li>Average Word Length: {{ results.quality_metrics.avg_word_length }}</li>
+                            <li>Lexical Diversity: {{ results.quality_metrics.lexical_diversity }}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Style Metrics</h3>
+                        <ul class="list-disc pl-5">
+                            <li>Average Sentence Length: {{ results.style_metrics.avg_sentence_length }}</li>
+                            <li>Sentence Length Variance: {{ results.style_metrics.sentence_length_variance }}</li>
+                            <li>Lexical Diversity: {{ results.style_metrics.lexical_diversity }}</li>
+                            <li>Complex Words: {{ results.style_metrics.complex_words }}</li>
+                            <li>Simple Words: {{ results.style_metrics.simple_words }}</li>
+                            <li>Paragraph Count: {{ results.style_metrics.paragraph_count }}</li>
+                            <li>Transition Words: {{ results.style_metrics.transition_words }}</li>
+                            <li>Passive Voice Count: {{ results.style_metrics.passive_voice_count }}</li>
+                            <li>Question Count: {{ results.style_metrics.question_count }}</li>
+                            <li>Exclamation Count: {{ results.style_metrics.exclamation_count }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            {% if results.semantic_analysis and results.semantic_analysis is mapping %}
+    <div class="card">
+        <h2>Criteria Analysis</h2>
+        <div class="card-content">
+            {% for criterion, analysis in results.semantic_analysis.items() %}
+                <div class="criteria-item">
+                    <h3>{{ criterion }}</h3>
+                    <p>Max Similarity: {{ analysis.max_similarity|round(2) }}</p>
+                    <p>Average Similarity: {{ analysis.avg_similarity|round(2) }}</p>
+                    <p>Coverage Score: {{ analysis.coverage_score|round(2) }}</p>
+                    <p>Relevant Sentences:</p>
+                    <ul>
+                        {% for sentence in analysis.relevant_sentences %}
+                            <li>{{ sentence }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+            <!-- Sentiment Analysis Section -->
+            {% if results.sentiment_analysis %}
+                <section>
+                    <h2 class="text-xl font-semibold mb-4">Sentiment Analysis</h2>
+                    <div>
+                        <p>Positive Ratio: {{ results.sentiment_analysis.positive_ratio|round(2) }}</p>
+                        <p>Neutral Ratio: {{ results.sentiment_analysis.neutral_ratio|round(2) }}</p>
+                        <p>Negative Ratio: {{ results.sentiment_analysis.negative_ratio|round(2) }}</p>
+                        <p>Overall Tone: {{ results.sentiment_analysis.overall_tone|capitalize }}</p>
+                    </div>
+                </section>
+            {% endif %}
+
+            <!-- Text Preview Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Text Preview</h2>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="whitespace-pre-wrap">{{ results.text_preview }}</p>
+                </div>
+            </section>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ url_for('index') }}" class="inline-block bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Grade Another Assignment</a>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-4">
+        <p>© {{ current_year }} AI Assignment Grading System</p>
+    </footer>
+</body>
+</html>

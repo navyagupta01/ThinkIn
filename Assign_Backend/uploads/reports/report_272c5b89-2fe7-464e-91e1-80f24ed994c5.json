@@ -1,0 +1,74 @@
+{
+  "comprehensive_feedback": {
+    "detailed_analysis": {},
+    "overall_assessment": "This is a strong assignment with clear strengths that outweigh the areas for improvement.",
+    "strengths": [
+      "Clear and readable writing style",
+      "Good vocabulary diversity"
+    ],
+    "suggestions": [],
+    "weaknesses": []
+  },
+  "criteria": [
+    "Details on the history of AI "
+  ],
+  "final_score": 54,
+  "max_score": 100,
+  "percentage": 54,
+  "quality_metrics": {
+    "automated_readability_index": 8.33,
+    "avg_sentence_length": 2,
+    "avg_word_length": 3,
+    "grade_level": 5.25,
+    "lexical_diversity": 1,
+    "paragraph_count": 1,
+    "readability_score": 62.79,
+    "sentence_count": 1,
+    "unique_words": 2,
+    "word_count": 2
+  },
+  "score_breakdown": {
+    "content_quality": 10,
+    "criteria_coverage": 20,
+    "technical_accuracy": 7,
+    "writing_style": 17
+  },
+  "semantic_analysis": {
+    "Details on the history of AI ": {
+      "avg_similarity": 0.5717629194259644,
+      "coverage_score": 0.5717629194259644,
+      "max_similarity": 0.5717629194259644,
+      "relevant_sentences": [
+        "File: AI history.pdf"
+      ]
+    }
+  },
+  "sentiment_analysis": {
+    "negative_ratio": 0,
+    "neutral_ratio": 0,
+    "overall_tone": "positive",
+    "positive_ratio": 0
+  },
+  "style_metrics": {
+    "avg_sentence_length": 4,
+    "complex_words": 0,
+    "exclamation_count": 0,
+    "lexical_diversity": 1,
+    "paragraph_count": 1,
+    "passive_voice_count": 0,
+    "question_count": 0,
+    "sentence_length_variance": 0,
+    "simple_words": 2,
+    "transition_words": 0,
+    "word_frequency_distribution": [
+      [
+        "file",
+        1
+      ],
+      [
+        "ai",
+        1
+      ]
+    ]
+  }
+}

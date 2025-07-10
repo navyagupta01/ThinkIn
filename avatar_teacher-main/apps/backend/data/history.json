@@ -1,20 +1,26 @@
 [
   {
-    "id": 1751131176181,
-    "question": "hi what is AI??",
-    "answer": "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. AI can perform tasks such as problem-solving, understanding natural language, and recognizing patterns. It's a rapidly evolving field that impacts various industries, from healthcare to finance.",
-    "timestamp": "2025-06-28T17:19:36.181Z"
+    "id": 1751884756039,
+    "question": "are you gay?",
+    "answer": "As an AI, I don't have personal feelings or sexual orientation. My purpose is to assist and provide information to everyone, regardless of their identity. If you have any questions about travel or other topics, feel free to ask!",
+    "timestamp": "2025-07-07T10:39:16.039Z"
   },
   {
-    "id": 1750756320766,
-    "question": "hi what is C++??",
-    "answer": "C++ is a high-level programming language that is an extension of the C programming language. It includes object-oriented features and is widely used for system/software development, game development, and performance-critical applications. C++ supports various programming paradigms, including procedural, object-oriented, and generic programming, making it versatile for different types of projects. It was developed by Bjarne Stroustrup starting in 1979 at Bell Labs and has since become one of the most popular programming languages in the world.",
-    "timestamp": "2025-06-24T09:12:00.766Z"
+    "id": 1751884690056,
+    "question": "hi what is docker??",
+    "answer": "Docker is an open-source platform that automates the deployment, scaling, and management of applications using containerization. Containers allow developers to package applications with all their dependencies, ensuring that they run consistently across different environments. This makes it easier to develop, test, and deploy applications, as well as to manage microservices architectures.",
+    "timestamp": "2025-07-07T10:38:10.056Z"
   },
   {
-    "id": 1750756211921,
+    "id": 1751876665861,
     "question": "hi what is AI??",
     "answer": "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. AI can perform tasks such as understanding natural language, recognizing patterns, and making decisions based on data. It's a rapidly evolving field that impacts various industries, from healthcare to finance and beyond.",
-    "timestamp": "2025-06-24T09:10:11.921Z"
+    "timestamp": "2025-07-07T08:24:25.861Z"
+  },
+  {
+    "id": 1751876625618,
+    "question": "hi what is AI??",
+    "answer": "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. AI can perform tasks such as problem-solving, understanding natural language, and recognizing patterns in data. It is used in various applications, from virtual assistants to autonomous vehicles, enhancing efficiency and decision-making.",
+    "timestamp": "2025-07-07T08:23:45.618Z"
   }
 ]

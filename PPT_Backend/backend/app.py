@@ -58,127 +58,230 @@ def sanitize_filename(filename):
         filename = filename[:100]
     return filename
 
-def gen_structured_outline(topic, sessions, details):
+def gen_structured_outline(topic, sessions, details, syllabus):
     """Generate structured outline for multiple sessions with detailed content"""
-    prompt = f"""
-    Create a comprehensive curriculum for teaching '{topic}' across {sessions} sessions.
-    
-    IMPORTANT REQUIREMENTS:
-    1. Each bullet point should be 15-25 words long with detailed explanations
-    2. Include 8-12 slides per session minimum
-    3. Make content educational and comprehensive
-    4. For code slides, provide complete, working examples with explanations
-    5. Include practical examples and real-world applications
-    
-    Format your response as JSON with the following structure:
-    {{
-        "course_title": "Main Course Title",
-        "sessions": [
-            {{
-                "session_number": 1,
-                "session_title": "Session Title",
-                "slides": [
-                    {{
-                        "slide_title": "Slide Title",
-                        "content": [
-                            "Detailed bullet point explaining key concept with examples and context (15-25 words)",
-                            "Another comprehensive point covering important aspects of the topic (15-25 words)",
-                            "Third point with practical applications and real-world usage (15-25 words)",
-                            "Fourth point covering advanced concepts or common pitfalls (15-25 words)"
-                        ],
-                        "slide_type": "content"
-                    }},
-                    {{
-                        "slide_title": "Code Example: [Specific Topic]",
-                        "content": [
-                            "This code demonstrates how to implement [specific functionality] in {topic}",
-                            "Key points to understand in this implementation",
-                            "Common use cases and practical applications"
-                        ],
-                        "slide_type": "code",
-                        "code_content": [
-                            "# Complete working code example",
-                            "# with detailed comments explaining each step",
-                            "def example_function():",
-                            "    # Implementation details",
-                            "    return result"
-                        ]
-                    }},
-                    {{
-                        "slide_title": "Chart Title: [Data Description]",
-                        "content": [
-                            "This chart shows the relationship between key metrics in {topic}",
-                            "Analysis of trends and patterns visible in the data",
-                            "Implications for practical applications"
-                        ],
-                        "slide_type": "chart",
-                        "chart_data": {{
-                            "chart_type": "bar",
-                            "data": [
-                                ["Category", "Value"],
-                                ["Item A", 45],
-                                ["Item B", 67],
-                                ["Item C", 32],
-                                ["Item D", 78]
+    if syllabus.strip():
+        prompt = f"""
+        Create a comprehensive curriculum for teaching '{topic}' across {sessions} sessions, strictly based on the provided syllabus.
+
+        Syllabus: {syllabus}
+
+        IMPORTANT REQUIREMENTS:
+        1. Each bullet point should be 15-25 words long with detailed explanations
+        2. Include 8-12 slides per session minimum
+        3. Make content educational and comprehensive
+        4. For code slides, provide complete, working examples with explanations
+        5. Include practical examples and real-world applications
+        6. Distribute the syllabus topics evenly across the specified number of sessions
+        7. Each session should cover specific topics from the syllabus
+
+        Format your response as JSON with the following structure:
+        {{
+            "course_title": "Main Course Title",
+            "sessions": [
+                {{
+                    "session_number": 1,
+                    "session_title": "Session Title (covering specific syllabus topics)",
+                    "slides": [
+                        {{
+                            "slide_title": "Slide Title",
+                            "content": [
+                                "Detailed bullet point explaining key concept from syllabus with examples (15-25 words)",
+                                "Another comprehensive point covering syllabus topic (15-25 words)",
+                                "Third point with practical applications from syllabus (15-25 words)",
+                                "Fourth point covering advanced syllabus concepts (15-25 words)"
+                            ],
+                            "slide_type": "content"
+                        }},
+                        {{
+                            "slide_title": "Code Example: [Specific Syllabus Topic]",
+                            "content": [
+                                "This code demonstrates how to implement [specific syllabus functionality]",
+                                "Key points to understand in this implementation",
+                                "Common use cases and practical applications"
+                            ],
+                            "slide_type": "code",
+                            "code_content": [
+                                "# Complete working code example",
+                                "# with detailed comments explaining each step",
+                                "def example_function():",
+                                "    # Implementation details",
+                                "    return result"
                             ]
+                        }},
+                        {{
+                            "slide_title": "Chart Title: [Syllabus Data Description]",
+                            "content": [
+                                "This chart shows relationships in {topic} from syllabus",
+                                "Analysis of trends and patterns from syllabus topics",
+                                "Implications for practical applications"
+                            ],
+                            "slide_type": "chart",
+                            "chart_data": {{
+                                "chart_type": "bar",
+                                "data": [
+                                    ["Category", "Value"],
+                                    ["Item A", 45],
+                                    ["Item B", 67],
+                                    ["Item C", 32],
+                                    ["Item D", 78]
+                                ]
+                            }}
                         }}
-                    }}
-                ]
-            }}
-        ]
-    }}
-    
-    Make sure to:
-    - Create substantial, educational content for each slide
-    - Include proper code examples with comments when relevant
-    - Provide meaningful chart data related to the topic
-    - Ensure each bullet point is informative and detailed
-    - Cover both theoretical concepts and practical applications
-    
-    Topic: {topic}
-    Additional details: {details}
-    
-    Make the content professional, educational, and comprehensive. Each slide should provide real value to learners.
-    """
+                    ]
+                }}
+            ]
+        }}
+
+        Make sure to:
+        - Create substantial, educational content for each slide based on syllabus topics
+        - Include proper code examples with comments when relevant to syllabus
+        - Provide meaningful chart data related to syllabus topics
+        - Ensure each bullet point is informative and detailed
+        - Cover both theoretical concepts and practical applications from syllabus
+        - Align session content with specific syllabus topics
+
+        Topic: {topic}
+        Additional details: {details}
+        """
+    else:
+        prompt = f"""
+        Create a comprehensive curriculum for teaching '{topic}' across {sessions} sessions.
+
+        IMPORTANT REQUIREMENTS:
+        1. Each bullet point should be 15-25 words long with detailed explanations
+        2. Include 8-12 slides per session minimum
+        3. Make content educational and comprehensive
+        4. For code slides, provide complete, working examples with explanations
+        5. Include practical examples and real-world applications
+
+        Format your response as JSON with the following structure:
+        {{
+            "course_title": "Main Course Title",
+            "sessions": [
+                {{
+                    "session_number": 1,
+                    "session_title": "Session Title",
+                    "slides": [
+                        {{
+                            "slide_title": "Slide Title",
+                            "content": [
+                                "Detailed bullet point explaining key concept with examples and context (15-25 words)",
+                                "Another comprehensive point covering important aspects of the topic (15-25 words)",
+                                "Third point with practical applications and real-world usage (15-25 words)",
+                                "Fourth point covering advanced concepts or common pitfalls (15-25 words)"
+                            ],
+                            "slide_type": "content"
+                        }},
+                        {{
+                            "slide_title": "Code Example: [Specific Topic]",
+                            "content": [
+                                "This code demonstrates how to implement [specific functionality] in {topic}",
+                                "Key points to understand in this implementation",
+                                "Common use cases and practical applications"
+                            ],
+                            "slide_type": "code",
+                            "code_content": [
+                                "# Complete working code example",
+                                "# with detailed comments explaining each step",
+                                "def example_function():",
+                                "    # Implementation details",
+                                "    return result"
+                            ]
+                        }},
+                        {{
+                            "slide_title": "Chart Title: [Data Description]",
+                            "content": [
+                                "This chart shows the relationship between key metrics in {topic}",
+                                "Analysis of trends and patterns visible in the data",
+                                "Implications for practical applications"
+                            ],
+                            "slide_type": "chart",
+                            "chart_data": {{
+                                "chart_type": "bar",
+                                "data": [
+                                    ["Category", "Value"],
+                                    ["Item A", 45],
+                                    ["Item B", 67],
+                                    ["Item C", 32],
+                                    ["Item D", 78]
+                                ]
+                            }}
+                        }}
+                    ]
+                }}
+            ]
+        }}
+
+        Make sure to:
+        - Create substantial, educational content for each slide
+        - Include proper code examples with comments when relevant
+        - Provide meaningful chart data related to the topic
+        - Ensure each bullet point is informative and detailed
+        - Cover both theoretical concepts and practical applications
+
+        Topic: {topic}
+        Additional details: {details}
+        """
     return call_openrouter(prompt)
 
-def parse_text_outline(outline_text, topic, sessions):
+def parse_text_outline(outline_text, topic, sessions, syllabus):
     """Parse plain text outline into structured format as fallback with enhanced content"""
     lines = outline_text.split('\n')
     sessions_data = []
     current_session = None
     current_slide = None
-    
+
+    # If syllabus is provided, split it into topics
+    syllabus_topics = [t.strip() for t in syllabus.split(',')] if syllabus.strip() else []
+    if syllabus_topics:
+        sessions_per_topic = max(1, sessions // len(syllabus_topics))
+        remaining_sessions = sessions % len(syllabus_topics)
+    else:
+        sessions_per_topic = sessions
+        remaining_sessions = 0
+
+    session_counter = 0
+    topic_index = 0
+
     for line in lines:
         line = line.strip()
         if not line:
             continue
-            
+
         # Session detection
         if line.startswith('### Session') or line.startswith('Session'):
             if current_session:
                 sessions_data.append(current_session)
-            
-            session_title = line.replace('### ', '').replace('**', '')
+
+            if syllabus_topics and topic_index < len(syllabus_topics):
+                session_title = f"Session {session_counter + 1}: {syllabus_topics[topic_index]}"
+                if session_counter % sessions_per_topic == 0 and topic_index < len(syllabus_topics) - 1:
+                    topic_index += 1
+            else:
+                session_title = line.replace('### ', '').replace('**', '')
+
             current_session = {
                 "session_number": len(sessions_data) + 1,
                 "session_title": session_title,
                 "slides": []
             }
             current_slide = None
-            
+            session_counter += 1
+
         # Slide detection
         elif line.startswith('**Slide') and current_session:
             if current_slide:
                 current_session['slides'].append(current_slide)
-            
+
             slide_title = line.replace('**', '').replace('Slide ', '').split(':')[1].strip() if ':' in line else line.replace('**', '')
-            
-            # Determine slide type and create appropriate content
+            if syllabus_topics and topic_index < len(syllabus_topics):
+                slide_title = f"{slide_title} ({syllabus_topics[topic_index]})"
+
             slide_type = "content"
             chart_data = None
             code_content = None
-            
+
             if any(keyword in slide_title.lower() for keyword in ["code", "example", "implementation", "syntax", "programming"]):
                 slide_type = "code"
                 code_content = [
@@ -205,7 +308,7 @@ def parse_text_outline(outline_text, topic, sessions):
                         ["Expert Level", 15]
                     ]
                 }
-                
+
             current_slide = {
                 "slide_title": slide_title,
                 "content": [
@@ -216,32 +319,54 @@ def parse_text_outline(outline_text, topic, sessions):
                 ],
                 "slide_type": slide_type
             }
-            
+
             if chart_data:
                 current_slide["chart_data"] = chart_data
             if code_content:
                 current_slide["code_content"] = code_content
-                
+
         # Bullet points (enhance short ones)
         elif line.startswith('-') and current_slide:
             bullet = line[1:].strip()
-            # Enhance short bullet points
             if len(bullet.split()) < 8:
                 bullet = f"{bullet} - detailed explanation with practical examples and implementation considerations"
             current_slide['content'].append(bullet)
-            
+
         # Code content
         elif current_slide and any(keyword in line for keyword in ['import ', 'def ', 'class ', 'model =', 'print(']):
             if 'code_content' not in current_slide:
                 current_slide['code_content'] = []
             current_slide['code_content'].append(line)
-    
+
     # Add the last session and slide
     if current_slide and current_session:
         current_session['slides'].append(current_slide)
     if current_session:
         sessions_data.append(current_session)
-    
+
+    # Ensure enough sessions for syllabus topics
+    while len(sessions_data) < sessions:
+        session_num = len(sessions_data) + 1
+        topic_title = syllabus_topics[topic_index] if topic_index < len(syllabus_topics) else f"Additional Topics for {topic}"
+        if topic_index < len(syllabus_topics) and session_num % sessions_per_topic == 0:
+            topic_index += 1
+        sessions_data.append({
+            "session_number": session_num,
+            "session_title": f"Session {session_num}: {topic_title}",
+            "slides": [
+                {
+                    "slide_title": f"Introduction to {topic_title}",
+                    "content": [
+                        f"Overview of {topic_title} and its significance in {topic}",
+                        f"Key concepts and principles related to {topic_title}",
+                        f"Practical applications of {topic_title} in real-world scenarios",
+                        f"Best practices for understanding and applying {topic_title}"
+                    ],
+                    "slide_type": "content"
+                }
+            ]
+        })
+
     # Ensure we have enough content per session
     for session in sessions_data:
         while len(session['slides']) < 8:
@@ -256,7 +381,7 @@ def parse_text_outline(outline_text, topic, sessions):
                 ],
                 "slide_type": "content"
             })
-    
+
     return {
         "course_title": topic,
         "sessions": sessions_data
@@ -277,7 +402,6 @@ def create_chart(chart_data, filename):
         headers = data[0]
         values = data[1:]
         
-        # Professional color palette
         colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#6A994E', '#7209B7']
         
         if chart_type == 'bar':
@@ -292,7 +416,6 @@ def create_chart(chart_data, filename):
             bars = plt.bar(categories, nums, color=colors[:len(categories)], 
                           edgecolor='white', linewidth=1.5, alpha=0.8)
             
-            # Add value labels on bars
             for bar, num in zip(bars, nums):
                 plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + max(nums)*0.01,
                         f'{num:.1f}', ha='center', va='bottom', fontweight='bold')
@@ -316,7 +439,6 @@ def create_chart(chart_data, filename):
                     color=colors[0], markerfacecolor=colors[1], markeredgecolor='white', 
                     markeredgewidth=2)
             
-            # Add value labels
             for x, y in zip(x_vals, y_vals):
                 plt.text(x, y + max(y_vals)*0.02, f'{y:.1f}', ha='center', va='bottom', 
                         fontweight='bold')
@@ -340,7 +462,6 @@ def create_chart(chart_data, filename):
                                              startangle=90, colors=colors[:len(labels)],
                                              explode=[0.05]*len(labels), shadow=True)
             
-            # Enhance text appearance
             for autotext in autotexts:
                 autotext.set_color('white')
                 autotext.set_fontweight('bold')
@@ -352,7 +473,6 @@ def create_chart(chart_data, filename):
             
             plt.title(f'Distribution of {headers[0]}', fontsize=18, fontweight='bold', pad=20)
         
-        # Professional styling
         plt.gca().set_facecolor('#f8f9fa')
         plt.gcf().patch.set_facecolor('white')
         
@@ -372,15 +492,12 @@ def create_ppt_session(session_data, topic):
     try:
         prs = Presentation()
         
-        # Title slide
         title_slide = prs.slides.add_slide(prs.slide_layouts[0])
         title_slide.shapes.title.text = session_data.get('session_title', 'Session Title')
         
-        # Add subtitle if placeholder exists
         if len(title_slide.shapes.placeholders) > 1:
             title_slide.shapes.placeholders[1].text = f"Course: {topic}"
         
-        # Format title slide
         title_shape = title_slide.shapes.title
         if title_shape.has_text_frame:
             title_frame = title_shape.text_frame
@@ -390,16 +507,13 @@ def create_ppt_session(session_data, topic):
                 title_para.font.bold = True
                 title_para.font.color.rgb = RGBColor(0, 51, 102)
         
-        # Process each slide
         for slide_data in session_data.get('slides', []):
             slide_type = slide_data.get('slide_type', 'content')
             slide_title = slide_data.get('slide_title', 'Slide Title')
             
             if slide_type == 'chart' and 'chart_data' in slide_data:
-                # Create chart slide
-                slide = prs.slides.add_slide(prs.slide_layouts[5])  # Blank layout
+                slide = prs.slides.add_slide(prs.slide_layouts[5])
                 
-                # Add title
                 title_shape = slide.shapes.add_textbox(Inches(0.5), Inches(0.2), Inches(9), Inches(1))
                 title_frame = title_shape.text_frame
                 title_para = title_frame.paragraphs[0]
@@ -408,7 +522,6 @@ def create_ppt_session(session_data, topic):
                 title_para.font.bold = True
                 title_para.font.color.rgb = RGBColor(0, 51, 102)
                 
-                # Add descriptive text for chart
                 content_items = slide_data.get('content', [])
                 if content_items:
                     desc_shape = slide.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1))
@@ -418,32 +531,26 @@ def create_ppt_session(session_data, topic):
                     desc_para.font.size = Pt(16)
                     desc_para.font.color.rgb = RGBColor(51, 51, 51)
                 
-                # Generate chart
                 chart_filename = f"temp_chart_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.png"
                 chart_path = create_chart(slide_data['chart_data'], chart_filename)
                 
                 if chart_path and os.path.exists(chart_path):
                     try:
-                        # Add chart to slide
                         slide.shapes.add_picture(chart_path, Inches(0.5), Inches(2.5), 
                                                Inches(9), Inches(4.5))
                     except Exception as e:
                         print(f"Error adding chart to slide: {e}")
                     finally:
-                        # Clean up temp file
                         try:
                             os.remove(chart_path)
                         except:
                             pass
                 else:
-                    # If chart creation failed, convert to content slide
-                    self._create_content_slide(prs, slide_data)
+                    _create_content_slide(prs, slide_data)
                     
             elif slide_type == 'code':
-                # Create dedicated code slide
-                slide = prs.slides.add_slide(prs.slide_layouts[5])  # Blank layout
+                slide = prs.slides.add_slide(prs.slide_layouts[5])
                 
-                # Add title
                 title_shape = slide.shapes.add_textbox(Inches(0.5), Inches(0.2), Inches(9), Inches(1))
                 title_frame = title_shape.text_frame
                 title_para = title_frame.paragraphs[0]
@@ -452,14 +559,13 @@ def create_ppt_session(session_data, topic):
                 title_para.font.bold = True
                 title_para.font.color.rgb = RGBColor(0, 51, 102)
                 
-                # Add explanation text
                 content_items = slide_data.get('content', [])
                 if content_items:
                     exp_shape = slide.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(9), Inches(1.5))
                     exp_frame = exp_shape.text_frame
                     exp_frame.word_wrap = True
                     
-                    for i, item in enumerate(content_items[:2]):  # Show first 2 content items
+                    for i, item in enumerate(content_items[:2]):
                         if i == 0:
                             p = exp_frame.paragraphs[0]
                         else:
@@ -469,10 +575,8 @@ def create_ppt_session(session_data, topic):
                         p.font.color.rgb = RGBColor(51, 51, 51)
                         p.space_after = Pt(8)
                 
-                # Add code content
                 code_content = slide_data.get('code_content', [])
                 if code_content:
-                    # Create a text box for code with proper formatting
                     code_shape = slide.shapes.add_textbox(Inches(0.5), Inches(3), Inches(9), Inches(4))
                     code_frame = code_shape.text_frame
                     code_frame.word_wrap = True
@@ -481,31 +585,26 @@ def create_ppt_session(session_data, topic):
                     code_frame.margin_top = Inches(0.2)
                     code_frame.margin_bottom = Inches(0.2)
                     
-                    # Set background color for code
                     fill = code_shape.fill
                     fill.solid()
-                    fill.fore_color.rgb = RGBColor(45, 45, 45)  # Dark background
+                    fill.fore_color.rgb = RGBColor(45, 45, 45)
                     
-                    # Add border
                     line = code_shape.line
                     line.color.rgb = RGBColor(100, 100, 100)
                     line.width = Pt(1)
                     
-                    # Add code content with proper formatting
                     code_text = '\n'.join(str(line) for line in code_content)
                     code_para = code_frame.paragraphs[0]
                     code_para.text = code_text
                     code_para.font.name = 'Consolas'
                     code_para.font.size = Pt(14)
-                    code_para.font.color.rgb = RGBColor(220, 220, 220)  # Light text on dark background
+                    code_para.font.color.rgb = RGBColor(220, 220, 220)
                     code_para.space_after = Pt(0)
                     
             else:
-                # Regular content slide with improved formatting
-                slide = prs.slides.add_slide(prs.slide_layouts[1])  # Title and content
+                slide = prs.slides.add_slide(prs.slide_layouts[1])
                 slide.shapes.title.text = slide_title
                 
-                # Format title
                 title_shape = slide.shapes.title
                 if title_shape.has_text_frame:
                     title_frame = title_shape.text_frame
@@ -515,7 +614,6 @@ def create_ppt_session(session_data, topic):
                         title_para.font.bold = True
                         title_para.font.color.rgb = RGBColor(0, 51, 102)
                 
-                # Add content with better formatting
                 content_items = slide_data.get('content', [])
                 if content_items and len(slide.shapes.placeholders) > 1:
                     text_frame = slide.shapes.placeholders[1].text_frame
@@ -531,9 +629,9 @@ def create_ppt_session(session_data, topic):
                         
                         p.text = str(bullet_point)
                         p.level = 0
-                        p.font.size = Pt(18)  # Increased font size
+                        p.font.size = Pt(18)
                         p.font.color.rgb = RGBColor(51, 51, 51)
-                        p.space_after = Pt(16)  # More space between bullets
+                        p.space_after = Pt(16)
                         p.space_before = Pt(8)
         
         return prs
@@ -547,7 +645,6 @@ def _create_content_slide(prs, slide_data):
     slide = prs.slides.add_slide(prs.slide_layouts[1])
     slide.shapes.title.text = slide_data.get('slide_title', 'Content')
     
-    # Format title
     title_shape = slide.shapes.title
     if title_shape.has_text_frame:
         title_frame = title_shape.text_frame
@@ -586,26 +683,22 @@ def create_zip_with_ppts(presentations_data, topic):
             
             for i, session_data in enumerate(sessions, 1):
                 try:
-                    # Create PPT for this session
                     prs = create_ppt_session(session_data, topic)
                     
                     if prs is None:
                         print(f"Failed to create presentation for session {i}")
                         continue
                     
-                    # Save to buffer
                     ppt_buffer = io.BytesIO()
                     prs.save(ppt_buffer)
                     ppt_buffer.seek(0)
                     
-                    # Create filename
                     session_title = session_data.get('session_title', f'Session {i}')
                     safe_topic = sanitize_filename(topic)
                     safe_session_title = sanitize_filename(session_title)
                     
                     filename = f"{safe_topic}_Session_{i:02d}_{safe_session_title}.pptx"
                     
-                    # Add to zip
                     zip_file.writestr(filename, ppt_buffer.getvalue())
                     ppt_buffer.close()
                     
@@ -630,16 +723,14 @@ def generate():
         topic = data.get("topic", "Course")
         sessions = int(data.get("sessions", 1))
         details = data.get("details", "")
+        syllabus = data.get("syllabus", "")
         
-        print(f"Generating for topic: {topic}, sessions: {sessions}, details: {details}")
+        print(f"Generating for topic: {topic}, sessions: {sessions}, details: {details}, syllabus: {syllabus}")
 
-        # Generate structured outline
-        outline_response = gen_structured_outline(topic, sessions, details)
+        outline_response = gen_structured_outline(topic, sessions, details, syllabus)
         print("Generated structured outline response:\n", outline_response)
         
-        # Parse JSON response
         try:
-            # Extract JSON from response if it's wrapped in markdown
             if "```json" in outline_response:
                 json_start = outline_response.find("```json") + 7
                 json_end = outline_response.find("```", json_start)
@@ -657,22 +748,19 @@ def generate():
         except json.JSONDecodeError as e:
             print(f"JSON parsing error: {e}")
             print("Falling back to text parsing...")
-            presentations_data = parse_text_outline(outline_response, topic, sessions)
+            presentations_data = parse_text_outline(outline_response, topic, sessions, syllabus)
         
         print(f"Final presentations data structure: {presentations_data}")
         print(f"Number of sessions created: {len(presentations_data.get('sessions', []))}")
         
-        # Ensure we have valid data
         if not presentations_data.get('sessions'):
             return jsonify({"error": "No sessions were generated"}), 500
         
-        # Create zip file with multiple presentations
         zip_buffer = create_zip_with_ppts(presentations_data, topic)
         
         if zip_buffer is None:
             return jsonify({"error": "Failed to create presentations"}), 500
         
-        # Create download filename
         safe_topic = sanitize_filename(topic)
         zip_filename = f"{safe_topic}_Course_Materials.zip"
         

@@ -1,0 +1,113 @@
+{
+  "comprehensive_feedback": {
+    "detailed_analysis": {},
+    "overall_assessment": "This is a strong assignment with clear strengths that outweigh the areas for improvement.",
+    "strengths": [
+      "Good length and depth of content",
+      "Good vocabulary diversity",
+      "Good use of transition words for flow",
+      "Well addressed criteria: Case study on history of Artificial Intelligence"
+    ],
+    "suggestions": [
+      "Simplify language for better accessibility"
+    ],
+    "weaknesses": [
+      "Writing complexity may be too high"
+    ]
+  },
+  "criteria": [
+    "Case study on history of Artificial Intelligence"
+  ],
+  "final_score": 69,
+  "max_score": 100,
+  "percentage": 69,
+  "quality_metrics": {
+    "automated_readability_index": 15.53,
+    "avg_sentence_length": 14.53,
+    "avg_word_length": 6.02,
+    "grade_level": 14.03,
+    "lexical_diversity": 0.524,
+    "paragraph_count": 1,
+    "readability_score": 21.72,
+    "sentence_count": 72,
+    "unique_words": 548,
+    "word_count": 1046
+  },
+  "score_breakdown": {
+    "content_quality": 25,
+    "criteria_coverage": 20,
+    "technical_accuracy": 4,
+    "writing_style": 20
+  },
+  "semantic_analysis": {
+    "Case study on history of Artificial Intelligence": {
+      "avg_similarity": 0.3778672218322754,
+      "coverage_score": 0.769063413143158,
+      "max_similarity": 0.769063413143158,
+      "relevant_sentences": [
+        "Case Study: The History of Artificial Intelligence Introduction Artificial Intelligence (AI) has transformed from a speculative concept in science fiction to a cornerstone of modern technology, influencing industries, economies, and societies.",
+        "Case Study Analysis: Key Lessons The history of AI reveals several lessons: 1."
+      ]
+    }
+  },
+  "sentiment_analysis": {
+    "negative_ratio": 0.0625,
+    "neutral_ratio": 0.6875,
+    "overall_tone": "neutral",
+    "positive_ratio": 0.25
+  },
+  "style_metrics": {
+    "avg_sentence_length": 18.069444444444443,
+    "complex_words": 450,
+    "exclamation_count": 1,
+    "lexical_diversity": 0.6649006622516557,
+    "paragraph_count": 1,
+    "passive_voice_count": 0,
+    "question_count": 0,
+    "sentence_length_variance": 83.53684413580247,
+    "simple_words": 305,
+    "transition_words": 4,
+    "word_frequency_distribution": [
+      [
+        "ai",
+        31
+      ],
+      [
+        "intelligence",
+        12
+      ],
+      [
+        "systems",
+        10
+      ],
+      [
+        "like",
+        9
+      ],
+      [
+        "learning",
+        8
+      ],
+      [
+        "ais",
+        8
+      ],
+      [
+        "deep",
+        8
+      ],
+      [
+        "artificial",
+        7
+      ],
+      [
+        "neural",
+        7
+      ],
+      [
+        "data",
+        7
+      ]
+    ]
+  }
+}

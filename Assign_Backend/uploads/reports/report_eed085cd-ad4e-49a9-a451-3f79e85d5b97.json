@@ -1,0 +1,113 @@
+
+{
+  "comprehensive_feedback": {
+    "detailed_analysis": {},
+    "overall_assessment": "This is a strong assignment with clear strengths that outweigh the areas for improvement.",
+    "strengths": [
+      "Good length and depth of content",
+      "Good vocabulary diversity",
+      "Maintains a positive and engaging tone"
+    ],
+    "suggestions": [
+      "Simplify language for better accessibility"
+    ],
+    "weaknesses": [
+      "Writing complexity may be too high"
+    ]
+  },
+  "criteria": [
+    "Case study on history of Artificial Intelligence"
+  ],
+  "final_score": 58,
+  "max_score": 100,
+  "percentage": 58,
+  "quality_metrics": {
+    "automated_readability_index": 14.82,
+    "avg_sentence_length": 18.34,
+    "avg_word_length": 5.71,
+    "grade_level": 12.97,
+    "lexical_diversity": 0.463,
+    "paragraph_count": 1,
+    "readability_score": 31.98,
+    "sentence_count": 67,
+    "unique_words": 569,
+    "word_count": 1229
+  },
+  "score_breakdown": {
+    "content_quality": 25,
+    "criteria_coverage": 10,
+    "technical_accuracy": 7,
+    "writing_style": 16
+  },
+  "semantic_analysis": {
+    "Case study on history of Artificial Intelligence": {
+      "avg_similarity": 0.22071196138858795,
+      "coverage_score": 0.4496205747127533,
+      "max_similarity": 0.4496205747127533,
+      "relevant_sentences": [
+        "Pythons Rise in Data Science and AI (2010sPresent) The 2010s saw Python emerge as the language of choice for data science and artificial intelligence.",
+        "The History of Python: From Inception to Global Dominance Python, one of the most popular programming languages today, has a rich history that spans over three decades."
+      ]
+    }
+  },
+  "sentiment_analysis": {
+    "negative_ratio": 0,
+    "neutral_ratio": 0.2777777777777778,
+    "overall_tone": "positive",
+    "positive_ratio": 0.7222222222222222
+  },
+  "style_metrics": {
+    "avg_sentence_length": 21.970149253731343,
+    "complex_words": 475,
+    "exclamation_count": 0,
+    "lexical_diversity": 0.624113475177305,
+    "paragraph_count": 1,
+    "passive_voice_count": 0,
+    "question_count": 0,
+    "sentence_length_variance": 40.02895967921586,
+    "simple_words": 371,
+    "transition_words": 1,
+    "word_frequency_distribution": [
+      [
+        "python",
+        52
+      ],
+      [
+        "pythons",
+        18
+      ],
+      [
+        "like",
+        18
+      ],
+      [
+        "programming",
+        9
+      ],
+      [
+        "development",
+        9
+      ],
+      [
+        "van",
+        8
+      ],
+      [
+        "languages",
+        7
+      ],
+      [
+        "language",
+        7
+      ],
+      [
+        "data",
+        6
+      ],
+      [
+        "code",
+        6
+      ]
+    ]
+  }
+}

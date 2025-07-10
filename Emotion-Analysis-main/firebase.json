@@ -1,0 +1,15 @@
+{
+  "indexes": [],
+  "fieldOverrides": [],
+  "emulators": {
+    "dataconnect": {
+      "dataDir": "dataconnect/.dataconnect/pgliteData"
+    }
+  },
+  "dataconnect": {
+    "source": "dataconnect"
+  },
+  "database": {
+    "rules": "firestore.rules"
+  }
+}

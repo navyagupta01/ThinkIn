@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Classroom System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://meet.jit.si/external_api.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold text-center mb-6">🎓 Smart Classroom System</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Live Meeting -->
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-2">📹 Live Meeting</h2>
+            <div id="jitsi-container" class="w-full h-96 bg-gray-200 mb-2"></div>
+            <input id="meetingId" type="text" placeholder="Enter Meeting ID" class="border p-2 rounded w-full mb-2">
+            <input id="userEmail" type="email" placeholder="Enter your Email" class="border p-2 rounded w-full mb-2">
+            <button id="startMeeting" class="bg-blue-500 text-white px-4 py-2 rounded w-full">Start/Join Meeting</button>
+        </div>
+
+        <!-- Engagement Detection -->
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-2">🎯 Engagement Detection</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p><strong>System Status:</strong> <span id="systemStatus">🔄 Initializing...</span></p>
+                    <p><strong>Emotion:</strong> <span id="emotion">--</span></p>
+                    <p><strong>Engagement:</strong> <span id="engagement">--</span></p>
+                </div>
+                <div>
+                    <canvas id="headPoseCanvas" width="100" height="100" class="border"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Transcription -->
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-2">🎤 Live Transcription</h2>
+            <p id="transcript" class="h-32 overflow-y-auto border p-2 mb-2">📢 Waiting for speech input...</p>
+            <div class="flex space-x-2">
+                <button id="startStopRecording" class="bg-green-500 text-white px-4 py-2 rounded">🎤 Start Recording</button>
+                <button id="clearTranscript" class="bg-gray-500 text-white px-4 py-2 rounded">🗑️ Clear</button>
+                <button id="generateNotes" class="bg-purple-500 text-white px-4 py-2 rounded">📝 Generate Notes</button>
+            </div>
+        </div>
+
+        <!-- Attendance & Engagement -->
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="text-xl font-semibold mb-2">📊 Attendance & Engagement</h2>
+            <table id="attendanceTable" class="w-full border-collapse">
+                <thead>
+                <tr class="bg-gray-200">
+                    <th class="border p-2">Name</th>
+                    <th class="border p-2">Join Time</th>
+                    <th class="border p-2">Leave Time</th>
+                    <th class="border p-2">Current Emotion</th>
+                    <th class="border p-2">Current Engagement</th>
+                    <th class="border p-2">Avg Engagement</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td colspan="6" class="text-center p-2">📋 Start meeting to view participant data</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="mt-4 flex space-x-2">
+                <button id="downloadExcel" class="bg-blue-500 text-white px-4 py-2 rounded">📥 Download Excel</button>
+                <button id="downloadPdf" class="bg-blue-500 text-white px-4 py-2 rounded">📑 Download PDF</button>
+            </div>
+        </div>
+
+        <!-- Engagement Chart -->
+        <div class="bg-white p-4 rounded shadow col-span-2">
+            <h2 class="text-xl font-semibold mb-2">📈 Engagement Trends</h2>
+            <canvas id="engagementChart" class="w-full h-64"></canvas>
+        </div>
+
+        <!-- Generated Notes -->
+        <div class="bg-white p-4 rounded shadow col-span-2">
+            <h2 class="text-xl font-semibold mb-2">📚 Generated Notes</h2>
+            <p id="generatedNotes" class="h-32 overflow-y-auto border p-2 mb-2">🤖 AI is generating notes from your transcript...</p>
+            <div class="flex space-x-2">
+                <button id="downloadNotes" class="bg-blue-500 text-white px-4 py-2 rounded">📥 Download Notes</button>
+                <button id="copyNotes" class="bg-blue-500 text-white px-4 py-2 rounded">📋 Copy Notes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let meetingId = null;
+    let userEmail = null;
+    let userName = null;
+    let participantId = null;
+    let jitsiApi = null;
+    let chart = null;
+    let recognition = null;
+    let isRecording = false;
+
+    document.getElementById('startMeeting').addEventListener('click', () => {
+        meetingId = document.getElementById('meetingId').value.trim() || `smart-classroom-${Date.now()}`;
+        userEmail = prompt("Enter your Email:");
+        userName = userEmail.split('@')[0];
+
+        if (!userEmail) {
+            alert("Please enter your email.");
+            return;
+        }
+
+        const domain = 'meet.jit.si';
+        const options = {
+            roomName: meetingId,
+            width: '100%',
+            height: 400,
+            parentNode: document.querySelector('#jitsi-container'),
+            userInfo: {
+                email: userEmail,
+                displayName: userName
+            }
+        };
+        jitsiApi = new JitsiMeetExternalAPI(domain, options);
+
+        participantId = `participant-${Date.now()}`;
+        startVideoCapture();
+        fetchAttendanceData();
+        initChart();
+    });
+
+
+    async function startVideoCapture() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        document.getElementById('systemStatus').innerText = '✅ Running';
+        setInterval(() => captureFrame(video), 5050);
+      } catch (e) {
+        console.error('Camera error:', e);
+        document.getElementById('systemStatus').innerText = '❌ Camera Error';
+      }
+    }
+
+    function captureFrame(video) {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const imageData = canvas.toDataURL('image/jpeg');
+      analyzeFrame(imageData);
+    }
+
+    async function analyzeFrame(imageData) {
+      if (!meetingId || !participantId) return;
+      const res = await fetch('http://localhost:5050/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageData, meeting_id: meetingId, participant_id: participantId })
+      });
+      const data = await res.json();
+      document.getElementById('emotion').innerText = data.emotion || '--';
+      document.getElementById('engagement').innerText = data.fatigue || '--';
+      drawHeadPose(data.head_pose || {});
+    }
+
+    function drawHeadPose({ yaw = 0, pitch = 0 }) {
+      const canvas = document.getElementById('headPoseCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(50, 50, 40, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(50, 50);
+      const x = 50 + 40 * Math.sin(yaw * Math.PI / 180);
+      const y = 50 - 40 * Math.cos(pitch * Math.PI / 180);
+      ctx.lineTo(x, y);
+      ctx.strokeStyle = 'red';
+      ctx.stroke();
+    }
+
+    // Transcription
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.onresult = (event) => {
+        let interim = '', final = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        document.getElementById('transcript').innerText = final + interim;
+      };
+    }
+
+    document.getElementById('startStopRecording').addEventListener('click', () => {
+      if (!recognition) return alert('Not supported.');
+      if (isRecording) {
+        recognition.stop();
+        isRecording = false;
+        this.innerText = '🎤 Start Recording';
+      } else {
+        recognition.start();
+        isRecording = true;
+        this.innerText = '🎤 Stop Recording';
+      }
+    });
+
+    document.getElementById('clearTranscript').addEventListener('click', () => {
+      document.getElementById('transcript').innerText = '📢 Waiting for speech input...';
+    });
+
+    document.getElementById('generateNotes').addEventListener('click', () => {
+      const transcript = document.getElementById('transcript').innerText;
+      document.getElementById('generatedNotes').innerText =
+        transcript !== '📢 Waiting for speech input...'
+          ? 'Generated notes: ' + transcript.slice(0, 100) + '...'
+          : 'No transcript available.';
+    });
+
+    async function fetchAttendanceData() {
+      if (!meetingId) return;
+      const res = await fetch(`http://localhost:8080/api/attendance/meeting/${meetingId}`);
+      const data = await res.json();
+      const tbody = document.getElementById('attendanceTable').querySelector('tbody');
+      tbody.innerHTML = '';
+      data.forEach(r => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="border p-2">${r.participantName}</td>
+          <td class="border p-2">${r.joinTime || '--'}</td>
+          <td class="border p-2">${r.leaveTime || '--'}</td>
+          <td class="border p-2">${r.currentEmotion || '--'}</td>
+          <td class="border p-2">${r.currentEngagement || '--'}</td>
+          <td class="border p-2">${r.engagementScore || '--'}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function initChart() {
+      if (!meetingId) return;
+      const res = await fetch(`http://localhost:8080/api/analytics/chart-data/${meetingId}`);
+      const data = await res.json();
+      const ctx = document.getElementById('engagementChart').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(x => x.timestamp),
+          datasets: [{
+            label: 'Engagement Score',
+            data: data.map(x => Object.values(x.engagementScores)[0] || 0),
+            borderColor: 'blue',
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true, max: 1 }
+          }
+        }
+      });
+    }
+
+    // Downloads
+    document.getElementById('downloadExcel').addEventListener('click', async () => {
+      const res = await fetch(`http://localhost:8080/api/attendance/export/${meetingId}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `attendance_${meetingId}.xlsx`;
+      a.click();
+    });
+
+    document.getElementById('downloadPdf').addEventListener('click', () => alert('PDF export not yet implemented.'));
+
+    document.getElementById('downloadNotes').addEventListener('click', () => {
+      const notes = document.getElementById('generatedNotes').innerText;
+      const blob = new Blob([notes], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'notes.txt';
+      a.click();
+    });
+
+    document.getElementById('copyNotes').addEventListener('click', () => {
+      const notes = document.getElementById('generatedNotes').innerText;
+      navigator.clipboard.writeText(notes).then(() => alert('Notes copied to clipboard!'));
+    });
+
+    // Periodic refresh
+    setInterval(fetchAttendanceData, 10000);
+    setInterval(initChart, 30000);
+</script>
+</body>
+</html>
