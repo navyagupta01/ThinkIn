@@ -59,16 +59,16 @@
 *Tested on Intel® Core™ i7-1255U with 16GB RAM.*
 
 ---
+### 🔍 Model Inference Time Comparison
 
-## 📈 Visualizations
+![Inference Time](https://raw.githubusercontent.com/Mukul-Gupta-300/ThinkIN/main/Assets/Time%20Comparison.jpg)
 
-### 1. Inference Speed Comparison
+---
 
-![Inference Speed Chart](https://fake-link-to-bar-chart.com/inference-speed.png) <!-- Replace with actual path or local image -->
+### 🧮 CPU Utilization Comparison
 
-### 2. CPU Utilization Heatmap
+![CPU Utilization](https://raw.githubusercontent.com/Mukul-Gupta-300/ThinkIN/main/Assets/Utilization%20Comparison.jpg)
 
-![CPU Utilization](https://fake-link-to-cpu-heatmap.com/cpu-usage.png) <!-- Replace with actual path -->
 
 ---
 
