@@ -19,7 +19,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Configuration
-API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+API_KEY = os.getenv("OPENROUTER_API_KEY", "API_KEY")
 MODEL = "gpt-4o-mini"
 
 def call_openrouter(prompt: str) -> str:
