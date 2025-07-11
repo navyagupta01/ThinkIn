@@ -23,6 +23,8 @@ import seaborn as sns
 import io
 import base64
 from wordcloud import WordCloud
+from flask_cors import CORS
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -50,6 +52,7 @@ except Exception as e:
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size

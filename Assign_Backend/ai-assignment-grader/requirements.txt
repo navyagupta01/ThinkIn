@@ -1,8 +1,8 @@
 numpy==1.26.4
 Flask
-transformers==4.53.0
-torch==2.4.0
-torchaudio==2.4.0
+transformers
+torch
+torchaudio
 PyMuPDF
 nltk
 textstat
