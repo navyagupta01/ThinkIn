@@ -26,7 +26,7 @@
 | Layer | Tools / Frameworks |
 |-------|--------------------|
 | Frontend | ReactJS / Streamlit |
-| Backend | Flask / FastAPI |
+| Backend | Flask / FastAPI / SpringBoot |
 | NLP Models | Hugging Face (T5, BERT, mBERT) |
 | Speech | Whisper / Google Speech API |
 | TTS | ElevenLabs / Google TTS |
