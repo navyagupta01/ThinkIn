@@ -3,8 +3,8 @@ const { Client } = require('@notionhq/client');
 const readline = require('readline');
 
 // === YOUR API KEYS ===
-const NOTION_API_KEY = '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';
-const OPENROUTER_API_KEY = "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"
+const NOTION_API_KEY = 'API_KEY';
+const OPENROUTER_API_KEY = "API_KEY"
 
 // === SETUP NOTION CLIENT ===
 const notion = new Client({ auth: NOTION_API_KEY });
