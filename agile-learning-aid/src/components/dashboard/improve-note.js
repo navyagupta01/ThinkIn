@@ -2,8 +2,8 @@ import axios from 'axios';
 import { Client } from '@notionhq/client';
 
 const NOTION_API_KEY = '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';
-const OPENROUTER_API_KEY = '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';
-const NOTION_DATABASE_ID = '2222879adaa880bcaa1fd5f21117e3b8';
+const OPENROUTER_API_KEY = 'API_KEY';
+const NOTION_DATABASE_ID = 'ID';
 
 const notion = new Client({ auth: NOTION_API_KEY });
 
