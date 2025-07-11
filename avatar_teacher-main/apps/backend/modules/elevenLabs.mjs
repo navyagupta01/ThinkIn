@@ -17,7 +17,7 @@ async function convertTextToSpeech({ text, fileName }) {
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
   return new Promise((resolve, reject) => {
-    const command = `"C:\\games\\coding\\Intel\\avatar_teacher-main\\apps\\ttsenv\\Scripts\\tts.exe" --text "${text.replace(/"/g, '\\"')}" --out_path "${outputPath}" --model_path "C:\\Users\\mukul\\AppData\\Local\\tts\\tts_models--en--vctk--vits\\model_file.pth" --config_path "C:\\Users\\mukul\\AppData\\Local\\tts\\tts_models--en--vctk--vits\\config.json" --speaker_idx "p230"`;
+    const command = `"../../ttsenv/Scripts/ttx.exe" --text "${text.replace(/"/g, '\\"')}" --out_path "${outputPath}" --model_path "../../../tts_models--en--vctk--vits/model_file.pth" --config_path "../../../tts_models--en--vctk--vits/config.json" --speaker_idx "p230"`;
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
