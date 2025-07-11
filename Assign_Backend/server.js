@@ -136,7 +136,7 @@ async function extractTextFromFile(filepath) {
 }
 
 // Flask API client
-const FLASK_API_URL = 'http://localhost:6000/api/grade';
+const FLASK_API_URL = 'http://localhost:5100/api/grade';
 
 // Routes
 app.put('/api/assignments/:id', checkRole(['teacher']), upload.array('files', 5), async (req, res) => {

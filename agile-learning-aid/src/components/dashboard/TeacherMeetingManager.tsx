@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,21 +29,9 @@ const TeacherMeetingManager: React.FC = () => {
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
   const [transcript, setTranscript] = useState<any[]>([]);
   const [error, setError] = useState('');
-  const jitsiContainerRef = useRef<HTMLDivElement>(null);
-  const [jitsiApi, setJitsiApi] = useState<any>(null);
 
   const JAVA_BACKEND_URL = 'http://localhost:6000/api';
-
-  // Load Jitsi Meet external API script
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://meet.jit.si/external_api.js';
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  const JITSI_MEET_URL = 'http://localhost:5050'; // Same URL as in StudentMeetingJoin.tsx
 
   // Create and start a meeting
   const startMeeting = async () => {
@@ -70,7 +58,6 @@ const TeacherMeetingManager: React.FC = () => {
       });
       setMeetingId(response.data.id);
       setIsMeetingActive(true);
-      loadJitsi(response.data.id, user.name);
       toast({ title: 'Success', description: 'Meeting created successfully' });
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to create meeting';
@@ -82,20 +69,6 @@ const TeacherMeetingManager: React.FC = () => {
         variant: 'destructive',
       });
     }
-  };
-
-  // Load Jitsi Meet
-  const loadJitsi = (meetingId: string, displayName: string) => {
-    const domain = 'meet.jit.si';
-    const options = {
-      roomName: meetingId,
-      width: '100%',
-      height: 400,
-      parentNode: jitsiContainerRef.current,
-      userInfo: { displayName },
-    };
-    const api = new (window as any).JitsiMeetExternalAPI(domain, options);
-    setJitsiApi(api);
   };
 
   // Fetch analytics and transcript
@@ -120,15 +93,6 @@ const TeacherMeetingManager: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [isMeetingActive, meetingId]);
-
-  // Clean up Jitsi on unmount
-  useEffect(() => {
-    return () => {
-      if (jitsiApi) {
-        jitsiApi.dispose();
-      }
-    };
-  }, [jitsiApi]);
 
   // Chart data for engagement trends
   const chartData = {
@@ -203,13 +167,23 @@ const TeacherMeetingManager: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Jitsi Meet Video */}
+          {/* Jitsi Meet Iframe */}
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Live Meeting</CardTitle>
             </CardHeader>
             <CardContent>
-              <div ref={jitsiContainerRef} className="w-full h-[400px] rounded-lg overflow-hidden"></div>
+              {isMeetingActive && meetingId ? (
+                <iframe
+                  src={`${JITSI_MEET_URL}/${meetingId}`}
+                  title="Live Class"
+                  className="w-full h-[400px] rounded-lg border-none"
+                  allowFullScreen
+                  allow="camera; microphone"
+                ></iframe>
+              ) : (
+                <p className="text-gray-500">No active meeting</p>
+              )}
             </CardContent>
           </Card>
 
