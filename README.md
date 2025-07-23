@@ -1,4 +1,4 @@
-# ThinkIN: AI-Powered Interactive Learning Assistant for Classrooms 🎓🤖
+# ThinkIN: AI-Powered Interactive Learning Assistant for Classrooms 🎓
 
 ## Overview
 
